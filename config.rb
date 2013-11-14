@@ -1,5 +1,6 @@
 require 'susy'
 require 'middleman-sprockets'
+require 'middleman-gh-pages'
 
 Dotenv.load
 
