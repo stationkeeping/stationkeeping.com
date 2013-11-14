@@ -2,20 +2,10 @@
 title: Stationkeeping
 ---
 
-<% if current_page.parent %>
-  Parent: <%= current_page.parent.path %>
-<% end %>
 
 <% current_page.children.each do |p| %>
-  Child: <%= p.path %>
-<% end %>
-
-<% current_page.siblings.each do |p| %>
-  Sibling: <%= p.path %>
-<% end %>
-
-<% current_page.children.each do |p| %>
-  <% if p.data %>
-    Data: <%= p.data %>
-  <% end %>
+    <% p.children.each do |c| %>
+      <%= link_to c.path, c.path %>%>
+      <br>
+    <% end %>
 <% end %>
