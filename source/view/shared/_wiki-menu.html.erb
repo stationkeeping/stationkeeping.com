@@ -1,0 +1,7 @@
+<ul class="wiki-menu">
+  <% sitemap.find_resource_by_destination_path("wiki/index.html").children.each do |p| %>
+        <li>
+          <%= link_to p.data.title, url_for("/#{p.destination_path}") %>
+        </li>
+  <% end %>
+</ul>

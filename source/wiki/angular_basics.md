@@ -1,3 +1,7 @@
+---
+title: "Angular Basics"
+---
+
 #### Client-Side Templates
 
 Clear division between server and browser. Data and static assets from server. Populates templates and displayed in the browser
@@ -30,7 +34,7 @@ Unscoped:
 function AppController($scope){};
 ```
 
-Scoped: 
+Scoped:
 
 ```
 module.controller("AppController", function($scope) {});
@@ -51,7 +55,7 @@ Responsibilities:
 
 Services are Singletons.
 
-Responsibilities: 
+Responsibilities:
 
 - Should (almost) never reference the DOM
 - Contain logic independent of the view
