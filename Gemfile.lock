@@ -142,7 +142,7 @@ DEPENDENCIES
   dotenv (~> 0.9)
   middleman (~> 3.2)
   middleman-favicon-maker (~> 3.3)
-  middleman-gh-pages
+  middleman-gh-pages (~> 0.0)
   middleman-livereload (~> 3.1)
   middleman-minify-html (~> 3.1)
   middleman-sprockets (~> 3.2)
