@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>JS Objects</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,74 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h4 id="new-object">New Object</h4>
+
+<p><code>
+var object = new Object();
+object.example = "example";
+</code></p>
+
+<p>Is the same as:</p>
+
+<p><code>
+var object = {example: "example"};
+</code></p>
+
+<h4 id="call-and-this">Call and this</h4>
+
+<p>To set the scope of a function (what <code>this</code> refers to inside the function), call can be used. In this example, an anonymous object is passed as the first parameter to call, so exampleFunction's <code>this</code> points to the anonymous object.</p>
+
+<p>```
+var exampleFunction = function() {
+   console.log(this.name);
+}</p>
+
+<p>exampleFunction.call( {name: "example"} );
+```</p>
+
+<h4 id="constructors">Constructors</h4>
+
+<p>A constructor is just another function, but conventionally its name is upper case:</p>
+
+<p><code>
+function Example(name) {
+   this.name = name;
+   this.value = 33;
+}
+</code></p>
+
+<p>By then calling <code>new Example(name)</code>, the constructor's <code>this</code> property is set to a new Object instance which is automatically returned by the constructor function.</p>
+
+<p><em>The object will also have a reference to the constructor function used to create it in its <code>constructor</code> property</em></p>
+
+<p>A constructor is just that - a constructor. It is constructing an instance. Any functions created in the constructor are created very time the constructor is run. Conversely, any functions assigned using prototype are added to the prototype a single time (but don't have access to nay local variables in the constructor).</p>
+
+<h4 id="adding-functions">Adding functions</h4>
+
+<p>Although functions can be added to the constructed object in the constructor function, these are added on a per-instance basis - they are recreated and added for each instance that is created. This is wasteful in terms of memory. The alternative is to set them on the object's prototype. This is done once and the functions will be available to all objects:</p>
+
+<p><code>
+Example.proptotype.exampleFunction = function() {
+}
+</code></p>
+
+<h4 id="prototype-chaining-like-subclassing">Prototype Chaining (Like Subclassing)</h4>
+
+<p>The constructor of the chained object is called, using <code>call</code> to set the scope of the chained constructor to the derived constructor. Any parameters it needs are also passed in. This is very similar to a call to <code>super</code>. The chained constructor function runs and adds any properties or functions to the object created by the derived constructor. We also need to manually set the constructor to the derived constructor as it will be set to the chained object's constructor when it is created using <code>new</code>.</p>
+
+<p><code>
+function DerivedExample(name) {
+   Example.call(this, name);
+   this.constructor = DerivedExample;
+}
+</code></p>
+
+<p>We also need to link the prototype of the chained class to the derived class, so that the derived class gains access to the functions on the chained class:</p>
+
+<p><code>
+DerivedExample.prototype = new Example();
+</code></p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

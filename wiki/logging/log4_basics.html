@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Angular Basics</title>
+        <title>Log4 Basics</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,102 +29,146 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <h4 id="client-side-templates">Client-Side Templates</h4>
+                    <p>Ruby: <a href="https://github.com/colbygk/log4r">Log4R</a></p>
 
-<p>Clear division between server and browser. Data and static assets from server. Populates templates and displayed in the browser</p>
+<p>Objective C / Cocoa: <a href="https://github.com/robbiehanson/CocoaLumberjack">Cocoa Lumberjack</a></p>
 
-<h3 id="basics">Basics</h3>
-
-<h4 id="mvc">MVC</h4>
-
-<ul>
-  <li>Views: DOM Nodes</li>
-  <li>Controllers: JavaScript classes</li>
-  <li>Model: Object properties</li>
-</ul>
-
-<h4 id="dependency-injection">Dependency Injection</h4>
-
-<p>Declare what a class needs and it will be supplied by the container.</p>
-
-<h4 id="directives">Directives</h4>
-
-<p>HTML is extended using directives (like components).</p>
-
-<h3 id="more">More</h3>
-
-<h4 id="controllers">Controllers</h4>
-
-<p>Scope Controllers to the app module:</p>
-
-<p>Unscoped:</p>
-
-<p><code>
-function AppController($scope){};
-</code></p>
-
-<p>Scoped:</p>
-
-<p><code>
-module.controller("AppController", function($scope) {});
-</code></p>
-
-<p>Controllers have three responsibilities in your app:</p>
-
-<ul>
-  <li>Set up the initial state in your application’s model</li>
-  <li>Expose model and functions to the view (UI template) through $scope</li>
-  <li>Watch other parts of the model for changes and take action</li>
-</ul>
-
-<p>Responsibilities:</p>
-
-<ul>
-  <li>Should never reference the DOM</li>
-  <li>Should handle view behaviour - Decide what should happen if user does X and decide where to get Y from</li>
-</ul>
-
-<h4 id="services">Services</h4>
-
-<p>Services are Singletons.</p>
-
-<p>Responsibilities:</p>
-
-<ul>
-  <li>Should (almost) never reference the DOM</li>
-  <li>Contain logic independent of the view</li>
-</ul>
-
-<h4 id="directives-1">Directives</h4>
-
-<p>Responsibilities</p>
-
-<ul>
-  <li>Watch DOM</li>
-  <li>Manipulate DOM</li>
-</ul>
-
-<h3 id="scope">Scope</h3>
-
-<ul>
-  <li>Scope should be read-only in templates; a template should only ever read from scope.</li>
-  <li>Scope should be write-only in controllers; a controller should only ever write to scope.</li>
-</ul>
+<p>Javascript: <a href="http://log4javascript.org">Log4JS</a></p>
 
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">
   
         <li>
-          <a href="/wiki/angular_basics.html">Angular Basics</a>
+          <a href="/wiki/angular_js/"></a>
         </li>
   
         <li>
-          <a href="/wiki/one.html">One</a>
+          <a href="/wiki/aspect_ratios/"></a>
         </li>
   
         <li>
-          <a href="/wiki/two.html">Two</a>
+          <a href="/wiki/asset_sync/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/boxen/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/browser/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/css/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/deployment/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/devise/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ember_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/git/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/google_analytics/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/handlebars_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/heroku/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/html/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/irb/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/logging/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/middleman/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/postgresql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/pow/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_estimating/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_management/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rails/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rake/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_gems/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_snippets/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sass/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sidekiq/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sinatra/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sublime_text/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/unix/"></a>
         </li>
   
 </ul>

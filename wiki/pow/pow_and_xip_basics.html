@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>POW And XIP Basics </title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,55 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h2 id="powhttppowcx-docshttppowcxmanualhtml"><a href="http://pow.cx/">POW</a> [<a href="http://pow.cx/manual.html">Docs</a>]</h2>
+
+<p>Pow lets you symlink a .dev domain to a rack application running locally. Where you previously may have been using <em>http://localhost:8888</em>, you can instead use <em>http://somewebapp.dev</em></p>
+
+<p>Setup depends on your requirements:</p>
+
+<h3 id="basic">Basic</h3>
+<p>If running on 3000 (Rails default), create a .dev domain by adding a symlink to the folder containing the app in the ~.pow directory.</p>
+
+<p><code>
+$ cd ~/.pow
+$ ln -s /path/to/somewebapp
+</code></p>
+
+<h3 id="port-proxyinghttppowcxmanualhtmlsection214"><a href="http://pow.cx/manual.html#section_2.1.4">Port Proxying</a>.</h3>
+<p>If running on another port, create a .dev domain (via Port Proxying) by creating a file in the ~.pow directory containing the port number) with the name of your app. This means you must have app per port.</p>
+
+<p><code>
+$ echo 8080 &gt; ~/.pow/somewebapp
+</code></p>
+
+<h3 id="non-rack-applications">Non-Rack applications</h3>
+<p>To use .pow on a non-rack application simply put site content in a public directory.</p>
+
+<h3 id="pow-logs">Pow Logs</h3>
+
+<p>Pow stores a log for each app in <code>~/Library/Logs/Pow/apps/</code>. To Tail the log:</p>
+
+<p><code>
+$tail -f ~/Library/Logs/Pow/apps/my-app-name.log
+</code></p>
+
+<h2 id="xipiohttpxipio"><a href="http://xip.io/">XIP.IO</a></h2>
+
+<p>XIP.IO allows you to access your dev machine from other devices on the same LAN using your machine's IP Address.</p>
+
+<p>Example (Assuming a rack app is running as somesite.dev on a machine with an IP of 192.168.1.4:</p>
+
+<p><code>
+http://somesite.192.168.1.4.xip.io
+</code></p>
+
+<p><strong>Note that there is no .dev before the IP Address and that the IP is of the the machine running Rack app, not the one connecting to it</strong></p>
+
+<p>If this stops working suddenly, check that the IP address of the machine hasn't changed using System Prefs/Network to get its IP address.</p>
+
+<p>This will allow Typekit fonts to work without restriction.
+It also works nicely with <a href="http://html.adobe.com/edge/inspect/">Adobe Edge Inspect</a> for testing devices.</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

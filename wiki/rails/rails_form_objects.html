@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Rails Form Objects</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,18 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Intention: Decouple form layout from Database model</p>
+
+<ol>
+  <li>
+    <p>Passed into views using forms to provide Model-like API to form, so that form knows what to present (fields and values of those fields)</p>
+  </li>
+  <li>
+    <p>Converts form data into associations and/or attributes on the model it represents</p>
+  </li>
+</ol>
+
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

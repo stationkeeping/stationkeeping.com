@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Ember Templates</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,167 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h4 id="block-expressions">Block Expressions</h4>
+
+<h5 id="logic">Logic</h5>
+
+<p>Define a property in a controller:</p>
+
+<p><code>
+App.ApplicationController = Ember.Controller.extend({
+  isOK: false
+});
+</code></p>
+
+<p>And use logic in the template:</p>
+
+<p>```
+{{#if isOK}}</p>
+<h1>OK</h1>
+<p>{{/if}}
+```</p>
+
+<p>Or:</p>
+
+<p>```
+{{#if isOK}}</p>
+<h1>OK</h1>
+<p>{{else}}</p>
+<h1>Not OK</h1>
+<p>{{/if}}
+```</p>
+
+<p>Or:</p>
+
+<p>```
+{{#unless isOK}}</p>
+<h1>Not OK</h1>
+<p>{{/unless}}
+```</p>
+
+<h5 id="enumeration">Enumeration</h5>
+
+<p>Define a property in a controller:</p>
+
+<p><code>
+App.ApplicationController = Ember.Controller.extend({
+  things: [{name:"ONE"}, {name:"TWO"}]
+});
+</code></p>
+
+<p>Then in the template:</p>
+
+<p>```</p>
+<ul>
+  {{#each things}}
+    <li>The thing is: {{name}}</li>
+  {{/each}}
+</ul>
+<p>```</p>
+
+<p>Or preserving scope:</p>
+
+<p>```</p>
+<ul>
+  {{#each thing in things}}
+    <li>The thing is: {{thing.name}}</li>
+  {{/each}}
+</ul>
+<p>```</p>
+
+<p>You can add an <code>else</code> to either of these loops:</p>
+
+<p>```</p>
+<ul>
+  {{#each thing in things}}
+    <li>The thing is: {{thing.name}}</li>
+  {{else}}
+    <li>No thing at all</li>
+  {{/each}}
+</ul>
+<p>```</p>
+
+<h5 id="setting-scope">Setting Scope</h5>
+
+<p>Use <code>with</code> to set the scope. For example normally:</p>
+
+<p><code>
+{{thing.name}}
+</code></p>
+
+<p>But using scope:</p>
+
+<p><code>
+{{#with thing}}
+  {{name}}
+{{/with}}
+</code></p>
+
+<h5 id="binding-attributes-of-html-elements-to-controller-properties">Binding attributes of HTML elements to controller properties</h5>
+
+<p>This includes classes and ids. </p>
+
+<p><code>
+App.ApplicationController = Ember.Controller.extend({
+  logoUrl: "graphics/logo.png"
+});
+</code></p>
+
+<p><code>
+&lt;div id="logo"&gt;
+  &lt;img {{bindAttr src="logoUrl"}} alt="Logo"&gt;
+&lt;/div&gt;
+</code></p>
+
+<p>If you are using it for classes and the property is a boolean, it works as a switch:</p>
+
+<ul>
+  <li>false = no class added</li>
+  <li>true = dasherised version of property name added (<code>someProperty</code> becomes <code>some-property</code>)</li>
+</ul>
+
+<p>To decouple the a boolean property name from the class, use:</p>
+
+<p>```
+&lt;div {{bindAttr class="isTrue:class-to-add-if-true:class-to-add-if-false"}}&gt;</p>
+<p>WHatevers</p>
+<p>&lt;/div&gt;
+```</p>
+
+<h5 id="actions">Actions</h5>
+
+<p>A basic action (by default <code>action</code> will listen for <code>click</code>):</p>
+
+<p>The controller:</p>
+
+<p>```
+ExampleApp.ApplicationController = Ember.Controller.extend({</p>
+
+<p>doSomething: function(param) {
+    console.log("Did Something "+param);
+  }
+});
+```</p>
+
+<p>In the template:</p>
+
+<p><code>
+&lt;button {{action "doSomething" Beautiful}}&gt;Click Me&lt;/button&gt;
+</code></p>
+
+<p>Or if you want a different action:</p>
+
+<p><code>
+&lt;button {{action doSomething" Beautiful on="mouseUp" }}&gt;Click Me&lt;/button&gt;
+</code></p>
+
+<p>And to prevent bubbling to parent:</p>
+
+<p><code>
+&lt;button {{action doSomething bubbles=false }}&gt;Click Me&lt;/button&gt;
+</code></p>
+
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

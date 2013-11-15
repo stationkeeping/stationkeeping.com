@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Sublime Text Packages</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,90 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Useful packages and how to use them.</p>
+
+<h1 id="ui">UI</h1>
+
+<h3 id="side-bar-enhancements">Side Bar Enhancements</h3>
+<p><a href="https://github.com/titoBouzout/SideBarEnhancements/tree/st3">Site</a></p>
+
+<p>Improved right-click options in the sidebar</p>
+
+<h3 id="sublime-terminal">Sublime Terminal</h3>
+<p>[Site](http://wbond.net/sublime_packages/terminal</p>
+
+<p>Open Terminal at Files or Project. Easily configure it to use iTerm2.</p>
+
+<h1 id="syntax">Syntax</h1>
+
+<h2 id="general">General</h2>
+
+<h3 id="alignment">Alignment</h3>
+<p><a href="http://wbond.net/sublime_packages/alignment">Site</a>
+<em>Ctrl + Cmd + A</em></p>
+
+<p>Alignment of multi-line selections and multiple selections to a common character:</p>
+
+<p>In JavaScript:
+<code>
+var one = 1;
+var three = 3;
+var fifteen = 15;
+</code>
+Becomes:
+<code>
+var one     = 1;
+var three   = 3;
+var fifteen = 15;
+</code></p>
+
+<p>In Sass:
+<code>
+padding: 8px 24px 8px 6px;
+border-top: 1px solid black;
+</code>
+Becomes:
+<code>
+padding     : 8px 24px 8px 6px;
+border-top  : 1px solid black;
+</code></p>
+
+<h3 id="change-quotes">Change Quotes</h3>
+<p><a href="https://github.com/colinta/SublimeChangeQuotes">Site</a></p>
+
+<p>Change single to double or double to single quotes.
+Note: There is no key binding - it is used from the command pallette: <code>ChangeQuotes</code></p>
+
+<h3 id="sublime-linter">Sublime Linter</h3>
+<p><a href="https://github.com/SublimeLinter/SublimeLinter">Site</a></p>
+
+<p>Currently to install the ST3 Version:
+<code>
+$ cd ~/.config/sublime-text-3/Packages
+$ git clone https://github.com/SublimeLinter/SublimeLinter.git
+$ cd SublimeLinter
+$ git checkout sublime-text-3
+</code></p>
+
+<h2 id="javascript">JavaScript</h2>
+
+<h3 id="jsformat">JSFormat</h3>
+<p>[Site](https://github.com/jdc0589/JsFormat}</p>
+
+<p>Formats JavaScript files using JSBeautifier. </p>
+
+<h3 id="beautifyruby">BeautifyRuby</h3>
+<p>[Site]https://github.com/CraigWilliams/BeautifyRuby
+<em>Ctrl + Cmd + K</em></p>
+
+<p>Format Ruby code (including in .erb files) using the Ruby Script Beautifier.
+Note: You will probably need to set the ruby path in its  User settings. </p>
+
+<h3 id="ruby-test">Ruby Test</h3>
+<p><a href="https://github.com/maltize/sublime-text-2-ruby-tests">Site</a></p>
+
+<p>Ruby Test allows you to run tests from sublime text. Currently need to launch ST from the command line so that it has access to envs defined in <code>.bash_profile</code>.</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

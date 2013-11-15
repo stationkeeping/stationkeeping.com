@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <!-- Use title if it's in the page YAML frontmatter -->
+        <title>Angular TDD</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="/css/app/application.css">
+        <script src="js/vendor/modernizr-2.6.1.min.js"></script>
+        <script type="text/javascript" src="//use.typekit.net/cay8udd.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+        <![endif]-->
+        <div class="page-container">
+            <header class="page-header" >
+                <h1><a href="/">Stationkeeping</a></h1>
+
+            </header>
+            <div class="page-body">
+                <div class="primary">
+                    <p>Please read <a href="http://newtriks.com/2013/06/11/automating-angularjs-with-yeoman-grunt-and-bower/">my blog post</a> for general setup.</p>
+
+<h2 id="test-types">Test Types</h2>
+
+<ol>
+  <li>Unit tests (./test/spec) - focused on isolating and testing small functional units of code i.e. a single class and it's methods. <a href="http://pivotal.github.io/jasmine/">Jasmine</a> is used for unit testing.</li>
+</ol>
+
+<ul>
+  <li>
+    <p>Run unit tests:</p>
+
+    <p><code>grunt test:unit</code></p>
+  </li>
+  <li>
+    <p>Run unit tests with autowatch enabled so tests are auto run on code change:</p>
+
+    <p><code>karma start</code></p>
+  </li>
+</ul>
+
+<ol>
+  <li>End to end tests (./test/e2e) -  scenario based testing i.e. a series of user defined steps (high level). <a href="https://github.com/angular/angular.js/blob/master/src/ngScenario/dsl.js">Angular Scenario Runner</a> is used for e2e testing and is based on Jasmine but does not have all its features available.</li>
+</ol>
+
+<ul>
+  <li>
+    <p>Run e2e tests:</p>
+
+    <p><code>grunt test:e2e</code></p>
+  </li>
+</ul>
+
+<p><strong>NOTE</strong></p>
+
+<p>Ensure the karma proxy uses the same port as the grunt configured localhost server.</p>
+
+<p>Each test class begins with a <em>describe</em> block which declares a group of context specific behaviors that will be tested. </p>
+
+<p>A method named <em>beforeEach()</em> is used to run any setup code required to run the tests and as the name describes, is run before every test. All unit tests will create a new instance of the context being tested e.g.</p>
+
+<pre><code>// load the controller's module
+beforeEach(module('knowledgevisionHtml5PlaylistappApp'));
+</code></pre>
+
+<p>Finally the <em>it()</em> method creates an example of behavior expected. This conveniently uses an <em>expect()</em> method that utilises specific <a href="https://github.com/pivotal/jasmine/wiki/Matchers">matchers</a> to test the code logic e.g.</p>
+
+<pre><code>expect(1).toBe(1);
+</code></pre>
+
+<p><strong>Note</strong></p>
+
+<p>Test classes are usually created automatically if using the <a href="https://github.com/yeoman/generator-angular">Angular generator</a> for Yeoman.</p>
+
+<h2 id="controllers">Controllers</h2>
+
+<p>Initialize the controller with a mock scope in a <em>beforeEach()</em> method, note injection of dummy data:</p>
+
+<pre><code>var MainCtrl, scope;
+beforeEach(inject(function($controller, $rootScope) {
+    // Create a new scope
+    scope = $rootScope.$new();
+    // Dummy data
+    scope.foo = [{
+      'id': '1',
+      'type': 'string'
+    }];
+    // Store the controller instance in a class variable
+    // injecting dummy scope
+    MainCtrl = $controller('MainCtrl', {
+      $scope: scope
+    });
+}));
+</code></pre>
+
+<p>Example expectation:</p>
+
+<pre><code>it('first item in foo array should have a type of string', function() {
+    expect(scope.first.type).toBe('string');
+});
+</code></pre>
+
+<h2 id="directives">Directives</h2>
+
+<h3 id="element-directive">Element directive</h3>
+
+<p>Use a <em>beforeEach()</em> method to create a new instance of the template used by the directive (defined by templateURL):</p>
+
+<pre><code>beforeEach(module('views/templates/templateOne.html'));
+</code></pre>
+
+<p>Use a <em>beforeEach()</em> method to store a new element based on code as used in the application to instantiate the directive and store in a class variable:</p>
+
+<pre><code>beforeEach(inject(function($rootScope, $compile) {
+    // we might move this tpl into an html file as well...
+    elm = angular.element('&lt;div class="hero-unit"&gt;&lt;foobar ng-repeat="item in items" id="{{item.id}}" type="{{item.type}}""&gt;&lt;/foobar&gt;&lt;/div&gt;');
+    scope = $rootScope;
+    $compile(elm)(scope);
+    scope.$digest();
+}));
+</code></pre>
+
+<p>Use jQuery style syntax to target nodes etc within the compiled directive and run expectations:</p>
+
+<pre><code>it("should display the number of items in the items list", function() {
+    var list = elm.find('li');
+    expect(list.length).toBe(2);
+});
+</code></pre>
+
+<h3 id="attribute-directive">Attribute directive</h3>
+
+<p>If using a service/model within the directive, inject a service in a <em>beforeEach()</em> method to test attributed data:</p>
+
+<pre><code>var elm, scope, testFooService;
+beforeEach(inject(function($rootScope, $compile, fooService) {
+    testFooService = fooService;
+</code></pre>
+
+<p>Example expectation:</p>
+
+<pre><code>it("should assign the correct item type", function() {
+    var v = elm.find('item')[0];
+    expect(v.getAttribute('type')).toBe('string');
+});
+</code></pre>
+
+<h3 id="testing-for-elements">Testing for elements</h3>
+
+<p>Use: <code>expect(element.find('ul').html()).toBeDefined();</code> and not: <code>expect(element.find('ul')).toBeTruthy();</code>. The latter will always be <strong>true</strong> due to <code>element.find()</code> returns <code>{}</code> if there is no element.</p>
+
+<h2 id="filters">Filters</h2>
+
+<p>Use a <em>beforeEach()</em> method to create a new instance of the filter to test:</p>
+
+<pre><code>// initialize a new instance of the filter before each test
+var timeFilter;
+beforeEach(inject(function($filter) {
+    timeFilter = $filter('timeFilter');
+}));
+</code></pre>
+
+<p>Pass a value into the filter with the expectation of the result:</p>
+
+<pre><code>it('should return a number in a time format', function() {
+    expect(timeFilter(0)).toBe('00:00');
+});
+</code></pre>
+
+<h2 id="services">Services</h2>
+
+<p>Use a <em>beforeEach()</em> method to inject and assign the service class to a class variable:</p>
+
+<pre><code>// instantiate service
+var rootScope, testVideoService;
+
+beforeEach(inject(function($rootScope, $compile, fooService) {
+    rootScope = $rootScope;
+    testFooService = fooService;
+}));
+</code></pre>
+
+<p>Example testing the service exists:</p>
+
+<pre><code>it('should have a service', function() {
+    expect(testFooService).toNotEqual(null);
+});
+</code></pre>
+
+<h2 id="method-invocation-spy">Method invocation (Spy)</h2>
+
+<ol>
+  <li>
+    <p>Using the object that methods will be tested for invocation (optionally also testing data passed), create the spy [Object], [Method]:</p>
+
+    <p><code>spyOn(fooService, 'setFooElement').andCallThrough();</code></p>
+  </li>
+  <li>
+    <p>Use one of the spy methods e.g. <em>toHaveBeenCalledWith()</em> to an expectation:</p>
+
+    <pre><code> it("should have called setFooElement on the fooService with the correct foo object", function() {
+     var f = elm.find('foo')[0];
+     expect(testFooService.setFooElement).toHaveBeenCalledWith(f);
+ });
+</code></pre>
+  </li>
+</ol>
+
+<h2 id="broadcasted-events-spy">Broadcasted events (Spy)</h2>
+
+<ol>
+  <li>Create a spy mock without using an object i.e. 'listener'</li>
+  <li>Add an event handler for the broadcasted event</li>
+  <li>Run the functionality on the class that will trigger the broadcast</li>
+  <li>
+    <p>Run an expectation using the spy method e.g <em>toHaveBeenCalled()</em></p>
+
+    <pre><code> it('should broadcast somethingUpdated event', function() {
+     var somethingUpdatedListener = jasmine.createSpy('listener');
+     rootScope.$on('somethingUpdated', somethingUpdatedListener);
+     testFooService.something(20);
+     expect(somethingUpdatedListener).toHaveBeenCalled();
+ });
+</code></pre>
+  </li>
+</ol>
+
+<h2 id="dom-events">DOM events</h2>
+
+<ol>
+  <li>Create a new event</li>
+  <li>Initialize the event with the event name</li>
+  <li>
+    <p>Dispatch the event using the associated object.</p>
+
+    <pre><code> it('should broadcast some event', function() {
+     var f = elm.find('foo')[0];
+     var evt = document.createEvent('Event');
+     evt.initEvent('some', true, true);
+     f.dispatchEvent(evt);
+     expect(f.something).toBe(14);
+ });
+</code></pre>
+  </li>
+</ol>
+
+<h2 id="mocks">Mocks</h2>
+
+<h3 id="http-requests">HTTP requests</h3>
+
+<p>Inject Angular's own fake HTTP service <a href="http://docs.angularjs.org/api/ngMock.$httpBackend">$httpBackend</a> into a <em>beforeEach()</em> method and assign to a class variable:</p>
+
+<pre><code>beforeEach(inject(function($controller, $rootScope, _$httpBackend_) {
+    $httpBackend = _$httpBackend_;
+}
+</code></pre>
+
+<p>Mock the HTTP request (GET, POST etc) and add your own response data:</p>
+
+<pre><code>$httpBackend.when('GET', 'some.json').respond({
+  "template": "views/templateOne.html"
+});
+</code></pre>
+
+<p>Ensure there are no outstanding requests in an <em>afterEach()</em> method:</p>
+
+<pre><code>afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+});
+</code></pre>
+
+<p>Flush following a test that utilises the fake service:</p>
+
+<pre><code>it('should attach a list of items to the scope', function() {
+    expect(scope.items.length).toBe(3);
+    $httpBackend.flush();
+  });
+</code></pre>
+
+<h3 id="further-example">Further example</h3>
+
+<p>Angular provides it's own built in mocks. However, in certain situations there maybe a need to create your own. This <a href="http://southdesign.de/blog/mock-angular-js-modules-for-test-di.html">article</a> excellently explains how to do this.</p>
+
+<h2 id="handy-hints">Handy Hints</h2>
+
+<ul>
+  <li>Use <code>console.log(angular.mock.dump(element));</code> to view the element html content as a string.</li>
+</ul>
+
+<hr />
+
+<h3 id="further-reading">Further reading</h3>
+
+<ul>
+  <li>Unit testing with <a href="http://www.joezimjs.com/javascript/javascript-unit-testing-with-jasmine-part-2/">Jasmine</a></li>
+  <li>Jasmine spy <a href="http://tobyho.com/2011/12/15/jasmine-spy-cheatsheet/">cheatsheet</a></li>
+  <li>Old but good <a href="http://www.yearofmoo.com/2013/01/full-spectrum-testing-with-angularjs-and-testacular.html">full-spectrum testing</a></li>
+  <li>Vojtajina directive testing <a href="https://github.com/vojtajina/ng-directive-testing">example</a></li>
+  <li>Good examples of component based testing in this <a href="https://github.com/angular-ui/bootstrap/blob/master/src/">repos</a></li>
+  <li><a href="https://github.com/pivotal/jasmine/wiki/Matchers">Matchers</a></li>
+  <li><a href="https://github.com/pivotal/jasmine/wiki/Spies">Spies</a></li>
+</ul>
+
+                </div>
+                <div class="secondary">
+                    <ul class="wiki-menu">
+  
+        <li>
+          <a href="/wiki/angular_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/aspect_ratios/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/asset_sync/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/boxen/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/browser/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/css/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/deployment/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/devise/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ember_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/git/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/google_analytics/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/handlebars_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/heroku/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/html/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/irb/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/logging/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/middleman/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/postgresql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/pow/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_estimating/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_management/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rails/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rake/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_gems/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_snippets/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sass/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sidekiq/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sinatra/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sublime_text/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/unix/"></a>
+        </li>
+  
+</ul>
+
+                </div>
+            </div>
+            <footer class="page-footer">
+                <p>Gently sculpted from lint by Simon's mum.</p>
+            </footer>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

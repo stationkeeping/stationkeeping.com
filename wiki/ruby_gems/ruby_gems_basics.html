@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Ruby Gems Basics</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,77 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>By default gems are installed into <code>~.bundle</code>. You can tell bundler to use a project directory instead using:</p>
+
+<p><code>
+$ bundle install vendor
+</code></p>
+
+<p>This will sue symlinks to a single location. To install actual gems locally:</p>
+
+<p><code>
+bundle install vendor --disable-shared-gems
+</code></p>
+
+<p>In this case bundler  iterm  </p>
+
+<p>If a gem name is different from the name needed in a require statement, for example the gem is called <code>sqlite3-ruby</code> and the name is <code>sqlite</code>, the gem will not be auto-required, and you would need to add <code>require  sqlite</code> to use it. </p>
+
+<p>To map the gem name to the correct name so it is auto-required, use:</p>
+
+<p><code>
+gem "sqlite-rails", require: "sqlite"
+</code></p>
+
+<p>For using a gem from a Git repo:</p>
+
+<p><code>
+gem 'paperclip', :git =&gt; 'git://github.com/thoughtbot/paperclip.git'
+</code></p>
+
+<p>For using a local gem:</p>
+
+<p><code>
+gem 'example', :path =&gt; '~/code/example'
+</code></p>
+
+<p>For using a local gem locally only, and a git repo remotely:</p>
+
+<p><code>
+$ bundle config.example "Path/to/local/git/repo/of/example
+</code></p>
+
+<p>Then add the gem to the <code>Gemfile</code> as a git repo instead of a Rubygem. The <code>github</code> argument can be blank:</p>
+
+<p><code>
+gem "example",  github: "", branch: "master"
+</code></p>
+
+<p>To install gems without installing gems from particular groups, for example on production:
+<code>
+$ bundle install --without development test
+</code></p>
+
+<p>To package gems to <code>vendor/cache</code> to avoid install from external sources:</p>
+
+<p><code>
+$ bundle package
+</code></p>
+
+<p>This could be used to deploy gems from a local repo to a remote location that doesn't have access to the local repo.</p>
+
+<p>Rbenv installs gems to: </p>
+
+<p><code>
+{USER_HOME}/.rbenv/versions/{RUBY_VERSION}/lib/ruby/gems/{COMPATABILITY_LEVEL}/gems/{GEM_NAME}-{GEM_VERSION}
+</code></p>
+
+<p>For example:</p>
+
+<p><code>
+/Users/me/.rbenv/versions/1.9.3-p392/lib/ruby/gems/1.9.1/gems/example-1.15.0
+</code></p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

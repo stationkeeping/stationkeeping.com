@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Ember Views</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,39 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Mostly, a template alone will suffice, however sometimes complex event handling necessitates a View.</p>
+
+<p>A View translates DOM events to semantic events meaningful to the application.</p>
+
+<p>Create a view (specifying its template):</p>
+
+<p><code>
+var view = Ember.View.create({
+  templateName: 'exampleTemplate'
+});
+</code></p>
+
+<p>Attach to/Remove from document:</p>
+
+<p><code>
+view.appendTo('#container'); // To specific element
+view.append(); // To body
+view.remove(); // To body
+</code></p>
+
+<p>Insert a view into a template:</p>
+
+<p><code>
+{{view App.ExampleView}}
+</code>
+Or with content within:
+<code>
+{{#view App.ExampleView}}
+   This is a clickable area!
+{{/view}}
+</code></p>
+
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

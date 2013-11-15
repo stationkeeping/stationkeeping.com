@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Heroku Basics</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,179 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h4 id="basic-commands">Basic Commands</h4>
+
+<p>Create app (initialise local Git repo first):</p>
+
+<p><code>$ heroku create --stack cedar</code></p>
+
+<p>Change the app name to something more memorable:</p>
+
+<p><code>$ heroku apps:rename newname</code></p>
+
+<p>Push app to heroku:</p>
+
+<p><code>$ git push heroku master</code></p>
+
+<p>Open the app in the browser:</p>
+
+<p><code>$ heroku open</code></p>
+
+<p>Check the app status/processes:</p>
+
+<p><code>$ heroku ps</code></p>
+
+<p>Run remote command on the Heroku shell:</p>
+
+<p><code>$ heroku run XXXX</code></p>
+
+<p>E.g.</p>
+
+<p><code>$ heroku run rake db:migrate</code></p>
+
+<p>Run the irb console on Heroku:</p>
+
+<p><code>$ heroku run console</code></p>
+
+<p>Or run bash:</p>
+
+<p><code>$ heroku run bash</code></p>
+
+<p>Drop the database</p>
+
+<p><code>heroku pg:reset DATABASE</code></p>
+
+<h4 id="keeping-environmental-variables-in-sync">Keeping Environmental Variables in Sync</h4>
+
+<p>Keep all your environmental variables in a <code>.env</code> locally (<strong>keep it out of version control</strong>). Push to Heroku using:</p>
+
+<p><code>
+heroku config:push
+</code></p>
+
+<p>It is also possible to pull environmental variables from Heroku using:</p>
+
+<p><code>
+heroku config:pull --overwrite --interactive
+</code></p>
+
+<h4 id="custom-domains">Custom domains</h4>
+
+<p>Add the domain to the app using:</p>
+
+<p><code>$ heroku domains:add example.com</code>
+<code>$ heroku domains:add www.example.com</code></p>
+
+<p>Add <a href="https://addons.heroku.com/zerigo_dns">Zerigo addon</a></p>
+
+<p><code>$ heroku addons:add zerigo_dns</code></p>
+
+<p>Point nameservers to Zerigo's nameservers (nameservers might not show up as having changed for a long time):</p>
+
+<p><code>
+a.ns.zerigo.net
+b.ns.zerigo.net
+c.ns.zerigo.net
+d.ns.zerigo.net
+e.ns.zerigo.net
+</code></p>
+
+<p>Switch mail over using <code>Zerigo add-on &gt; DNS &gt; + addSnippet &gt; Google Apps Email</code>. This will add MX records for Google Apps/Mail</p>
+
+<p>Set up mail.example.com subdomain using <code>Zerigo add-on &gt; DNS &gt; + add</code> and Add:</p>
+
+<p><code>
+Host: mail.example.com
+Type: CNAME
+Data: ghs.google.com
+</code></p>
+
+<p>Choose</p>
+
+<p>Verify changes:</p>
+
+<p>Using Zerigo's tools found under <code>Zerigo add-on &gt; DNS &gt; Domains &gt; Tools &gt; Nameserver check</code></p>
+
+<p>Using 'host' (Depends on DNS propagation):</p>
+
+<p><code>$ host www.example.com</code></p>
+
+<p><strong>Currently Zerigo doesn't work with European instances</strong></p>
+
+<p>To do the same thing without Zerigo, create 2 DNS records:</p>
+
+<ol>
+  <li>CNAME for www</li>
+</ol>
+
+<blockquote>
+  <p>CNAME record named <code>www</code> with a value of <code>example.herokuapp.com</code></p>
+</blockquote>
+
+<ol>
+  <li>A Record pointing to <a href="http://wwwizer.com/naked-domain-redirect">wwwizer</a> which will redirect naked domains appropriately (no setup needed)</li>
+</ol>
+
+<blockquote>
+  <p>Create a blank A Record pointing to 174.129.25.170 </p>
+</blockquote>
+
+<p>174.129.25.170 is <a href="http://wwwizer.com/naked-domain-redirect">wwwizer</a> which will redirect naked domains appropriately (no setup needed)</p>
+
+<h4 id="set-timezone">Set Timezone</h4>
+
+<p>Heroku uses the <a href="http://en.wikipedia.org/wiki/List_of_tz_database_time_zones">tz database timezone format</a>, so add the following as an environmental var:</p>
+
+<p><code>
+$ heroku config:set TZ=Europe/London
+</code></p>
+
+<h4 id="transferring-postgres-database-to-heroku">Transferring Postgres Database to Heroku</h4>
+
+<p>For lots of detail see: https://devcenter.heroku.com/articles/pgbackups#importing_from_a_backup</p>
+
+<p><strong>You need to install the pgbackups gem</strong></p>
+
+<p><code>
+$ heroku addons:add pgbackups
+</code></p>
+
+<p>You need to install </p>
+
+<ol>
+  <li>Dump the development database</li>
+</ol>
+
+<p><code>
+pg_dump -Fc --no-acl --no-owner -h localhost -U pedr example_database_name &gt; example_database_name.dump
+</code></p>
+
+<ol>
+  <li>Place the dump file on a public server (Dropbox public folder works fine) eg.</li>
+</ol>
+
+<p><code>
+'https://dl.dropboxusercontent.com/u/316978/example_database_name.dump'
+</code></p>
+
+<ol>
+  <li>Restore the remote database from the dump</li>
+</ol>
+
+<p><code>
+$ heroku pgbackups:restore DATABASE 'https://dl.dropboxusercontent.com/u/316978/example_database_name.dump'
+</code></p>
+
+<p>Note: If you aren't using <code>rake assets:precompile</code> locally, config vars need to be available during Heroku's build phase. This is enabled with:
+<code>
+$ heroku labs:enable user-env-compile --app example-app-name
+</code></p>
+
+<p>You can reset the database (actually equivalent to dropping it) with:
+<code>
+$ heroku pg:reset HEROKU_POSTGRESQL_RED_URL -a plp-s
+</code></p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

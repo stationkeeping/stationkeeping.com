@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Rails Active Record Associations</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,73 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Associations are exposed as methods, and behind the scenes an association is implemented as an <code>AssociationProxy</code>. The proxy delegates most instance methods to the actual association (a ruby object or Array). <code>AssociationProxy</code> is actually the base class for a class specific to the association, with a:</p>
+
+<p><code>
+AssociationProxy
+   - BelongsToAssociation
+   - HasOneAssociation
+   - BelongsToPolymorphicAssociation
+   - AssociationCollection 
+      - HasAndBelongsToMany
+      - HasManyAssociation
+      - HasManyThroughAssociation
+      - HasOneThroughAssociation
+</code></p>
+
+<h4 id="indexes">Indexes</h4>
+
+<p>Add indexes to any foreign key columns in a migration:</p>
+
+<p><code>
+add_index :example, :foo_id
+</code></p>
+
+<h5 id="counter-cache">Counter Cache</h5>
+
+<p>Getting the number of items in a relationship is usually an expensive database operation, needing multiple hits:</p>
+
+<p><code>
+owner.belongings.length
+</code></p>
+
+<p>A counter cache tracks the number of items in a belongs_to relationship, ensuring the value is available on the owning instance. It is declared on the belonging member:</p>
+
+<p><code>
+belongs_to :foo, counter_cache: true
+</code></p>
+
+<p>And a column must be added to the owning member with a default value of 1:</p>
+
+<p><code>
+add_column :owners, :belongers_count, :integer, default: 0
+</code></p>
+
+<p>It is used on the owning menber:</p>
+
+<p><code>
+owner.belongings_count
+</code></p>
+
+<h5 id="using-associations-named-differently-to-the-class-they-refer-to">Using Associations Named Differently To The Class THey Refer To</h5>
+
+<p>Sometimes it may be necessary to name an association differently, for example, a relationship might be named <code>latest_foo</code>, but refer to <code>foo</code>. In this case, the <code>class_name</code> can be set:</p>
+
+<p><code>
+has_one :latest_foo, class_name: :foo
+</code></p>
+
+<p>It's OK to have both a <code>has_many</code> and a <code>has_one</code> to the same model, sharing a primary key:</p>
+
+<p><code>
+class Foo
+   has_many :bars
+   has_one :latest_bar
+end
+</code></p>
+
+<p>##### </p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

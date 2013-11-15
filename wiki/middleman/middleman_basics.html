@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <!-- Use title if it's in the page YAML frontmatter -->
+        <title>Middleman Basics</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="/css/app/application.css">
+        <script src="js/vendor/modernizr-2.6.1.min.js"></script>
+        <script type="text/javascript" src="//use.typekit.net/cay8udd.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+        <![endif]-->
+        <div class="page-container">
+            <header class="page-header" >
+                <h1><a href="/">Stationkeeping</a></h1>
+
+            </header>
+            <div class="page-body">
+                <div class="primary">
+                    <h2 id="setup">Setup</h2>
+
+<p><code>$ gem install middleman</code></p>
+
+<p>Navigate to directory that will contain your project directory:</p>
+
+<p><code>$ middleman init project_name --template=html5</code></p>
+
+<p>Add elements to .gitignore.</p>
+
+<p>Add gems to Gemfile:</p>
+
+<p>```
+# Sync Assets to S3 (wraps Asset Sync)
+gem 'middleman-sync'</p>
+
+<h1 id="add-support-for-sprockets-including-fingerprinting">Add support for Sprockets including Fingerprinting</h1>
+<p>gem 'middleman-sprockets'</p>
+
+<h1 id="automatically-reload-the-page-on-changes-to-the-source">Automatically reload the page on changes to the source</h1>
+<p>gem 'middleman-livereload'</p>
+
+<h1 id="minify-html-output">Minify HTML Output</h1>
+<p>gem 'middleman-minify-html'</p>
+
+<h1 id="add-support-for-responsive-grids">Add support for responsive grids</h1>
+<p>gem 'susy'</p>
+
+<h1 id="load-environmental-variables-from-env-file">Load environmental variables from .env file</h1>
+<p>gem 'dotenv'</p>
+
+<h1 id="generate-touch-and-favicon-icons-using-a-single-base-image">Generate touch and favicon icons using a single base image</h1>
+<p>gem 'middleman-favicon-maker'</p>
+
+<h1 id="markdown">Markdown</h1>
+<p>gem 'redcarpet'
+```</p>
+
+<p>Install gems:</p>
+
+<p><code>$ bundle install</code></p>
+
+<p>Add '.env' file to root for use with the dot-env gem:</p>
+
+<p><code>
+AWS_ACCESS_KEY_ID=XXXXXXXXXXX
+AWS_SECRET_ACCESS_KEY=XXXXXXXXXX
+AWS_REGION=eu-west-1
+AWS_BUCKET=XXXXXXXXXXXXXXX
+</code></p>
+
+<p>Add/Uncomment gem setup in <code>config.rb</code>:</p>
+
+<p>```
+# Susy grids in Compass
+require 'susy'</p>
+
+<h1 id="markdown-engine">Markdown Engine</h1>
+<p>set :markdown_engine, :redcarpet</p>
+
+<p>require 'middleman-sprockets'</p>
+
+<h1 id="load-envs">Load Envs</h1>
+<p>Dotenv.load</p>
+
+<h1 id="change-compass-configuration">Change Compass configuration</h1>
+<p>compass_config do |config|
+  config.output_style = :compact
+end
+```</p>
+
+<p>Add/uncomment build-specific Gem activation in <code>config.rb</code>:</p>
+
+<p>```</p>
+
+<h1 id="create-gzipped-versions-of-files">Create gzipped versions of files</h1>
+<p>activate :gzip</p>
+
+<h1 id="build-specific-configuration">Build-specific configuration</h1>
+<p>configure :build do
+  # For example, change the Compass output style for deployment
+  activate :minify_css</p>
+
+<p># Minify Javascript on build
+  activate :minify_javascript</p>
+
+<p># Genrate Touch icons and Favicon
+  activate :favicon_maker</p>
+
+<p># Sprockets
+  activate :sprockets;</p>
+
+<p># Live Reload
+  activate :livereload</p>
+
+<p>end
+```</p>
+
+<p>Add helpers to <code>config.rb</code></p>
+
+<p>```
+# Methods defined in the helpers block are available in templates
+helpers do</p>
+
+<p># Page specific ID applied to body tag
+  def page_id
+    data.page.page_name.downcase().tr(' ', '_')
+  end</p>
+
+<p># Page title
+  def page_title
+    'Page Title Base | '+ data.page.page_name
+  end</p>
+
+<p># Range of Copyright
+  def copyright_years(start_year)
+    end_year = Date.today.year
+    if start_year == end_year
+      start_year.to_s
+    else
+      start_year.to_s + '-' + end_year.to_s
+    end
+  end</p>
+
+<p># Site Copyright
+  def site_copyright(start_year)
+    dates = copyright_years(start_year)
+    "© #{dates} XXXXXXXX SITE OWNER XXXXXXXX"
+  end</p>
+
+<p>end
+```</p>
+
+<p>Add head-loading JavaScript libs to <code>source/layouts/layout.erb</code>:</p>
+
+<p>Fonts:</p>
+
+<p>Typekit:</p>
+
+<p><code>
+&lt;!-- Make Typekit Kit available --&gt;
+&lt;script type="text/javascript" src="//use.typekit.net/XXXXX.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;try{Typekit.load();}catch(e){}&lt;/script&gt;
+</code></p>
+
+<p>Fonts.com:
+<code>
+&lt;!-- Make Fonts.com project fonts available --&gt;
+&lt;script type="text/javascript" src="http://fast.fonts.com/jsapi/XXXXX.js"&gt;&lt;/script&gt;
+</code></p>
+
+<p>Add post-body loading JavaScript Libs to <code>source/layouts/layout.erb</code>:</p>
+
+<p>```
+<!-- Added JavaScript Libs--></p>
+
+<!-- Media query support for IE8 -->
+<script src="js/vendor/respond.js"></script>
+
+<!-- Dynamically generated placeholder images -->
+<script src="js/vendor/holder.js"></script>
+
+<!-- Indeterminate Loader -->
+<script src="js/vendor/spin.js"></script>
+
+<!-- Templating -->
+<script src="js/vendor/handlebars.js"></script>
+
+<!-- Animation library -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.9.0/TweenMax.min.js"></script>
+
+<p>```</p>
+
+<p>Add js files for these libs to <code>source/js/vendor</code></p>
+
+<p>Add Deprecated Browser Alert to <code>source/layouts/layout.erb</code>:</p>
+
+<p><code>
+&lt;!-- Deprecated Browser Alert --&gt;
+&lt;!--[if lt IE 8]&gt;
+   &lt;div class="deprecated-browser-warning"&gt;
+      &lt;%= image_tag('ie_logo.png') %&gt;
+      &lt;h3&gt;You are using an outdated browser which is no longer supported by this site.&lt;/h3&gt;
+      &lt;p&gt;&lt;a href="http://browsehappy.com/"&gt;Upgrade your browser for free today&lt;/a&gt; or &lt;a href="http://www.google.com/chromeframe/?redirect=true"&gt;install Google Chrome Frame&lt;/a&gt; to experience this site.&lt;/p&gt;
+   &lt;/div&gt;
+&lt;![endif]--&gt;
+</code></p>
+
+<p>Add page specific ID to body tag of <code>source/layouts/layout.erb</code></p>
+
+<p><code>&lt;body class="&lt;%= page_id %&gt;"&gt;</code></p>
+
+<p>Add page-specific JavaScript loading to post-body:</p>
+
+<p><code>
+&lt;!-- Page Specific Javascripts --&gt;
+&lt;% if content_for?(:page_specific_javascripts) %&gt;  
+   &lt;%= yield_content :page_specific_javascripts %&gt;
+&lt;% end %&gt;
+</code></p>
+
+<p>Add template-specific JavaScript to post-body:</p>
+
+<p><code>
+&lt;!-- Page Specific Templates --&gt;
+&lt;% if content_for?(:page_specific_templates) %&gt;  
+   &lt;%= yield_content :page_specific_templates %&gt;
+&lt;% end %&gt;
+</code></p>
+
+<p>Change Page Title to use helper:</p>
+
+<p>```</p>
+<title>&lt;%= page_title %&gt;</title>
+<p>```</p>
+
+<p>Move normalize.css to <code>source/css/vendor</code>
+Delete Boilerplate LICENCE and README files.
+Delete Boilerplate favicon and touch icons.</p>
+
+<p>Change frontmatter entry in <code>source/index.html.erb</code> from 'title' to 'page_name'</p>
+
+<p>Change main css entry point in source/layouts/layout.erb to <code>source/css/site/main.css.scss</code></p>
+
+<p>Edit <code>source/css/site/main.css.scss</code>:</p>
+
+<p>```
+//= require vendor/normalize.css</p>
+
+<p>// Boilerplate Defaults
+@import "vendor/html5boilerplate/defaults";</p>
+
+<p>// Site Base
+@import "site/base";
+@import "site/modules";
+@import "site/layout";</p>
+
+<p>// Boilerplate Print Overrides
+@import "vendor/html5boilerplate/print";
+```</p>
+
+<p>Add sass files (See separate page)</p>
+
+<p>Fill out meta description:</p>
+
+<p><code>
+&lt;meta name="description" content="XXXXXXXXXX"&gt;
+</code></p>
+
+                </div>
+                <div class="secondary">
+                    <ul class="wiki-menu">
+  
+        <li>
+          <a href="/wiki/angular_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/aspect_ratios/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/asset_sync/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/boxen/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/browser/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/css/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/deployment/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/devise/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ember_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/git/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/google_analytics/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/handlebars_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/heroku/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/html/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/irb/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/logging/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/middleman/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/postgresql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/pow/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_estimating/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_management/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rails/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rake/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_gems/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_snippets/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sass/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sidekiq/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sinatra/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sublime_text/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/unix/"></a>
+        </li>
+  
+</ul>
+
+                </div>
+            </div>
+            <footer class="page-footer">
+                <p>Gently sculpted from lint by Simon's mum.</p>
+            </footer>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

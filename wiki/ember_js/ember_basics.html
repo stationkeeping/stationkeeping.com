@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Ember Basics</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,65 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h4 id="setup">Setup</h4>
+
+<p>Add <code>gem "ember-rails"</code> gem to Gemfile</p>
+
+<p>Generate a new project using:</p>
+
+<p><code>rails g ember:bootstrap</code></p>
+
+<p>Specify Ember varient in each environment file:</p>
+
+<p>In <code>config/environments/development.rb</code> and <code>config/environments/test.rb</code>:</p>
+
+<p><code>config.ember.variant = :development</code> </p>
+
+<p>In <code>config/environments/production.rb</code>:</p>
+
+<p><code>config.ember.variant = :production</code> </p>
+
+<h5 id="generated-javascript">Generated JavaScript</h5>
+
+<p>Ember adds the following to your <code>assets/javascripts/application.js</code>:</p>
+
+<p><code>
+//= require handlebars
+//= require ember
+//= require ember-data
+//= require_self
+//= require demo_app
+DemoApp = Ember.Application.create();
+</code></p>
+
+<p>The <code>demo_app</code> file is also generated and looks like this:</p>
+
+<p><code>
+//= require ./store
+//= require_tree ./models
+//= require_tree ./controllers
+//= require_tree ./views
+//= require_tree ./helpers
+//= require_tree ./templates
+//= require ./router
+//= require_tree ./routes
+//= require_self
+</code></p>
+
+<h4 id="entry-point">Entry Point</h4>
+
+<p>Application's entry point, found in <code>application.js</code> is:</p>
+
+<p><code>
+App = Ember.Application.create();
+</code></p>
+
+<ol>
+  <li>The application passes events from the document to your views</li>
+  <li>The application renders the application (root) template</li>
+  <li>The application creates a router and uses the current URL to setup initial routing.</li>
+</ol>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

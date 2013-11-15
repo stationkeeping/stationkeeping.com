@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Ember Notes</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,40 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Partial uses the context (view, controller) from where it was rendered from.</p>
+
+<p><strong>If your UI is nested, Your routes should be nested</strong></p>
+
+<p>If routes are nested, <code>{{outlet}}</code> can be used in a parent template to render the nested template.</p>
+
+<p>Ember.Controller looks for data on itself
+Ember.ObjectController proxies its Model, looking for data on the Model
+Ember.ArrayController proxies a collection</p>
+
+<p>Controllers are Singletons, accessible using <code>this.controllerFor()' E.g. </code>this.controllerFor('example')' would get <code>ExampleController</code>.</p>
+
+<p>Model attribute types: string, number, boolean, date.</p>
+
+<p>Start off with fixtures, then swap out for server implementation</p>
+
+<p>App.ApplicationRoute = Ember.Route.Extend({
+   setupController: function() {
+      this.controllerFor('example').set('model', App.Example.find());
+   }
+}); </p>
+
+<p><code>{{render}}</code> is designed to work with a singleton controller. It creates a new context, with its own controller, model and template.</p>
+
+<p>Use for / else in templates to react to an empty array:</p>
+
+<p>```
+{{ #each }}</p>
+
+<p>{{ else }}</p>
+
+<p>{{/ each}}
+```</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

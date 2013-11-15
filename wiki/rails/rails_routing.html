@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <!-- Use title if it's in the page YAML frontmatter -->
+        <title>Rails Routing</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="/css/app/application.css">
+        <script src="js/vendor/modernizr-2.6.1.min.js"></script>
+        <script type="text/javascript" src="//use.typekit.net/cay8udd.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+        <![endif]-->
+        <div class="page-container">
+            <header class="page-header" >
+                <h1><a href="/">Stationkeeping</a></h1>
+
+            </header>
+            <div class="page-body">
+                <div class="primary">
+                    <ol>
+  <li>Map URL to Controller</li>
+  <li>Genrate URLS (via URL helpers)</li>
+</ol>
+
+<p>When matching a route, the rooter starts from the top of <code>routes.rb</code> and works its way down, checking each route for a match until it finds one. If it reaches the end without finding a match, it raises an exception.</p>
+
+<p>Basic match (all HTTP verbs):</p>
+
+<p><code>
+match "example/foo" =&gt; "example#foo"
+</code></p>
+
+<p>Match a particular HTTP verb:</p>
+
+<p><code>
+get "example/foo" =&gt; "example#foo"
+post "example/foo" =&gt; "example#foo"
+</code></p>
+
+<p>Or for multiple HTTP verbs on the same route:</p>
+
+<p><code>
+match "example/foo" =&gt; "example#foo", [via: :get]
+</code></p>
+
+<p>Adding a segment key is like setting the segment as a variable: <code>:example</code> means that the value of this segment of the url will be set as a parameter, with a key being the segment key:</p>
+
+<p><code>
+get "example/foo/:example" # url of example/foo/66 would generate a parameter of params[:example] = 66
+</code></p>
+
+<h5 id="redirects">Redirects</h5>
+
+<p>You can redirect a path directly using:</p>
+
+<p><code>
+match "/foo", :to =&gt; redirect("/bar")
+</code></p>
+
+<p>Or using a block (with optional status):</p>
+
+<p><code>
+match "/foo/:id", :to =&gt;
+  redirect(status: 302) {|params| "/bar/#{params[:id]}" }
+</code></p>
+
+<h5 id="constraints">Constraints</h5>
+
+<p>Using constraints allows a segment key, anything in the params hash, or a number of other values like <code>subdomain</code> and <code>referrer</code> to be validated before a route matches. By using a second unconstrained route, any routes that failed to validate can be handled:</p>
+
+<p><code>
+match ':controller/show/:id' =&gt; :show, :constraints =&gt; {:id =&gt; /\d+/} #Check id is numerical
+match ':controller/show/:id' =&gt; :show_error
+</code></p>
+
+<p>Or constraining multiple routes:</p>
+
+<p><code>
+constraints :subdomain =&gt; '' do
+   …
+end
+</code></p>
+
+<p>To access the <code>request</code> object in constraints:</p>
+
+<p><code>
+match 'example/:id' =&gt; "example#show",
+  :constraints =&gt; proc {|request| request.params[:id].to_i &lt; 100 }
+</code></p>
+
+<h5 id="root-route">Root Route</h5>
+
+<p>The root of your domain is routed using:</p>
+
+<p><code>
+root :to =&gt; "pages#show"
+</code></p>
+
+<h5 id="root-globbing">Root Globbing</h5>
+
+<p>To expose an arbitrary number of segments to a controller as variables, effectively saying that 'after this point in the url, pass everything else in as a variable':</p>
+
+<p><code>
+get "example/foo/*remaining =&gt; example#show
+</code></p>
+
+<p>So anything in the url after <code>foo</code> will be added to the <code>params</code> hash as :remaining:</p>
+
+<p><code>
+example/foo/some/thing # params[:remaining] = "some/thing"
+example/foo/some/thing/else/longer # params[:remaining] = "some/thing/else/longer"
+</code></p>
+
+<h5 id="named-routes">Named Routes</h5>
+
+<p>Routes can be exposed via URL helpers using <code>as</code>. To generate a helper <code>bar_path</code>:</p>
+
+<p><code>
+get "example/foo" =&gt; example, as: 'bar'
+</code></p>
+
+<p>To pass variables into a URL helper:</p>
+
+<p><code>
+example_path(id: example_model.id)
+</code></p>
+
+<p>Or if it's a numerical id:</p>
+
+<p><code>
+example_path(example_model.id)
+</code></p>
+
+<p>Or use the object itself:</p>
+
+<p><code>
+example_path(example_model)
+</code></p>
+
+<h5 id="displaying-text-instead-of-id">Displaying text instead of id</h5>
+
+<p>Rails calls <code>to_param</code> to get the variable value to insert into the URL. By default it returns the model's <code>id</code>, but by overriding <code>to_param</code> anything can be returned, for example, the model name. Anything returned should be suitable for use in a URL:</p>
+
+<p><code>
+def to_param
+  name.parameterize
+end
+</code></p>
+
+<p>The flip side of using a slug rather than an id is that when a controller finds the model using the URL segment, it needs to do so using the appropriate attribute, for example:</p>
+
+<p><code>
+Example.find_by_parametised_name(params[:slug])
+</code></p>
+
+<h4 id="resources">Resources</h4>
+
+<p>Restful routes can be auto-generated in <code>routes.config</code> by using:</p>
+
+<p><code>
+resources :example
+</code></p>
+
+<p>Or for singular resources (which gives all routes other than <code>index</code>:</p>
+
+<p><code>
+resource :example
+</code></p>
+
+<p>Additional routes can be added using:</p>
+
+<p><code>
+resources :example do
+  get :foo, on: :member
+  get :bar, on: :collection
+end
+</code></p>
+
+<p>Or for multiple HTTP verbs for the same route:</p>
+
+<p><code>
+resources :example do
+  match :foo, via: [:get, :post], on: :member
+  match :bar, via: [:get, :post], on: :collection
+end
+</code></p>
+
+<p>To map custom names to the standard actions:</p>
+
+<p><code>
+resources :example, :path_names =&gt; { :new =&gt; 'foo', :edit =&gt; 'bar'}
+</code></p>
+
+<h5 id="nested-routes">Nested Routes</h5>
+
+<p>Resources can be nested using: </p>
+
+<p><code>
+resources :foo do
+  resources :bar
+end
+</code></p>
+
+
+                </div>
+                <div class="secondary">
+                    <ul class="wiki-menu">
+  
+        <li>
+          <a href="/wiki/angular_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/aspect_ratios/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/asset_sync/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/boxen/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/browser/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/css/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/deployment/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/devise/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ember_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/git/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/google_analytics/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/handlebars_js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/heroku/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/html/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/irb/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/js/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/logging/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/middleman/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/postgresql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/pow/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_estimating/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/project_management/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rails/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/rake/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_gems/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/ruby_snippets/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sass/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sidekiq/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sinatra/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sql/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/sublime_text/"></a>
+        </li>
+  
+        <li>
+          <a href="/wiki/unix/"></a>
+        </li>
+  
+</ul>
+
+                </div>
+            </div>
+            <footer class="page-footer">
+                <p>Gently sculpted from lint by Simon's mum.</p>
+            </footer>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

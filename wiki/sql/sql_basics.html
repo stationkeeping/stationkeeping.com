@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>SQL Basics</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,160 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h3 id="select">Select</h3>
+
+<h4 id="basic-selection">Basic Selection</h4>
+
+<p>SQL <em>select</em> queries return a <em>Results Set</em>.</p>
+
+<p>Select <code>foo</code> field from <code>Example</code> table</p>
+
+<p><code>
+SELECT foo FROM Examples;
+</code></p>
+
+<p>Select <code>foo</code> and <code>bar</code> fields from <code>Example</code> table</p>
+
+<p><code>
+SELECT foo, bar FROM Examples;
+</code></p>
+
+<p>Select all columns in the <code>Example</code> table:</p>
+
+<p><code>
+SELECT * FROM Examples;
+</code></p>
+
+<h5 id="distinct">Distinct</h5>
+
+<p>Select only distinct (unique) values from column <code>foo</code> from the <code>Example</code> table:</p>
+
+<p><code>
+SELECT DISTINCT foo FROM Examples;
+</code></p>
+
+<h5 id="where">Where</h5>
+
+<p>Select all records from the <code>Example</code> table that have a value of <code>bar</code> in their <code>foo</code> column.</p>
+
+<p><code>
+SELECT * FROM Examples WHERE foo=bar; 
+</code></p>
+
+<h5 id="operators">Operators</h5>
+
+<p>Other than basic comparators, (<code>=</code>, <code>&lt;=</code> etc), SQL supports the following operators:</p>
+
+<p>Select a value that falls between two values (inclusively).
+For example, select all records from <code>Examples</code> where the value of the <code>foo</code> column is between 0 and 5 inclusive:</p>
+
+<p><code>
+SELECT * FROM Examples WHERE foo BETWEEN 0 AND 5;
+</code></p>
+
+<p>Select a value that matches a give pattern. <code>%</code> is a wildcard character.
+For example, select all records from <code>Examples</code> where the value of the <code>foo</code> column starts with <em>a</em> and ends with <em>s</em>:</p>
+
+<p><code>
+SELECT * FROM Examples WHERE foo LIKE a%s;
+</code></p>
+
+<p>Like can be negated using <code>NOT</code>:</p>
+
+<p><code>
+SELECT * FROM Examples WHERE foo NOT LIKE a%s;
+</code></p>
+
+<p>Select a value that is one of given set of values.
+For example, select all records from <code>Examples</code> where the value of the <code>foo</code> column is <em>dog</em>, <em>cat</em> or <em>iguana</em>:</p>
+
+<p><code>
+SELECT * FROM Examples WHERE foo IN ("dog", "cat", "iguana")
+</code></p>
+
+<h5 id="logical-operators">Logical Operators</h5>
+
+<p><code>AND</code> allows a select based on multiple matches:
+For example, select all records <code>Examples</code> where the value of the <code>foo</code> column is <em>dog</em> and the value of the <code>bar</code> column is <em>potato</em>:</p>
+
+<p><code>
+SELECT * FROM Examples WHERE foo="dog" AND bar="Potato"
+</code></p>
+
+<p><code>OR</code> allows a select based on alternate matches.
+For example, select all records <code>Examples</code> where the value of the <code>foo</code> column is <em>dog</em> or the value of the <code>bar</code> column is  <em>potato</em>:</p>
+
+<p><code>
+SELECT * FROM Examples WHERE foo="dog" OR bar="potato"
+</code></p>
+
+<h4 id="sorting">Sorting</h4>
+
+<p>Results sets are ordered using <code>ORDER BY</code>.</p>
+
+<p>By default, <code>ORDER_BY</code> sorts in ascending order:</p>
+
+<p><code>
+SELECT * FROM Examples ORDER BY foo;
+</code></p>
+
+<p>This can be reversed using <code>DESC</code>:</p>
+
+<p><code>
+SELECT * FROM Examples ORDER BY foo DESC;
+</code></p>
+
+<p>Results can be sorted by multiple columns:</p>
+
+<p><code>
+SELECT * FROM Examples ORDER BY foo, bar;
+</code></p>
+
+<h3 id="insert">Insert</h3>
+
+<p>New records can be inserted using <code>INSERT INTO</code>.</p>
+
+<p>Either by passing the values alone (in which case order is crucial):</p>
+
+<p><code>
+INSERT INTO Examples VALUES ("cat", "potato");
+</code></p>
+
+<p>Or by passing column names as well:</p>
+
+<p><code>
+INSERT INTO Examples ("bar", "foo")  VALUES ("potato", "cat");
+</code></p>
+
+<h3 id="update">Update</h3>
+
+<p>Existing records can be updated using <code>UPDATE</code>.</p>
+
+<p><code>
+UPDATE Examples SET (foo="cat", bar="potato") WHERE foo="dog";
+</code></p>
+
+<p>Without the <code>WHERE</code>, all records will be updated:</p>
+
+<p><code>
+UPDATE Examples SET (foo="cat");
+</code></p>
+
+<h3 id="delete">Delete</h3>
+
+<p>Existing records can be deleted using <code>DELETE</code>.</p>
+
+<p><code>
+DELETE FROM Examples WHERE foo=cat;
+</code></p>
+
+<p>Without the <code>WHERE</code>, all records will be deleted:</p>
+
+<p><code>
+DELETE FROM Examples;
+</code></p>
+
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

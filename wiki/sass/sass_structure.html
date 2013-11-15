@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Sass Structure</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,52 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p><code>
+main.css.scss  # Entry Point
+   - vendor/html5boilerplate/defaults # Boilerplate uses Normalizr, but replace with desired reset
+   - base.css.scss
+       - utils # Sass functions
+       - colours 
+       - fonts 
+       - elements # Generic HTML elements
+       - sprites  
+       - grid # Site-wide grid setup - nothing page specific, but generic modules are OK
+</code></p>
+
+<p>Examples:</p>
+
+<p>```
+base/_colours.cs.scss</p>
+
+<h1 id="set-colours">Set colours</h1>
+<p>$red         : #F83739;
+$blue        : #6ED9D9;
+$yellow      : #EFEF1D;
+$green       : #21FFBC;
+$black       : #050505;
+$white       : #F7F5E2;
+$grayDark    : #363738;</p>
+
+<h1 id="assign-colours-to-semantic-classes-that-are-not-named-after-actual-colour-so-changing-a-colour-only-effects-this-file">Assign colours to semantic classes that are not named after actual colour so changing a colour only effects this file.</h1>
+
+<p>$filmColour  : $red;
+$musicColour : $blue;
+$newsColour  : $yellow;
+$aboutColour : $green;
+```</p>
+
+<p>```
+base/_fonts.css.scss</p>
+
+<h1 id="assign-fonts">Assign Fonts</h1>
+<p>$brandonGrotesque : "brandon-grotesque", "helvetica neue", helvetica, Arial, sans-serif;
+$centuryGothic    : "Century Gothic", CenturyGothic, AppleGothic, sans-serif;</p>
+
+<h1 id="assign-fonts-to-semantic-classes-that-are-not-named-after-the-actual-font-so-that-changing-a-font-only-effects-this-file">Assign fonts to semantic classes that are not named after the actual font so that changing a font only effects this file.</h1>
+<p>$titleFontFamily  : $brandonGrotesque;
+$bodyFontFamily   : $centuryGothic;
+```</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

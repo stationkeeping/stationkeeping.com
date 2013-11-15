@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Ruby Metaprogramming</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,46 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>There are no such things as class methods in Ruby. Classes are objects and every method is a method on an object. </p>
+
+<h4 id="eigenclass">Eigenclass</h4>
+
+<p>A method can be defined on a single object (instance):</p>
+
+<p>```
+class Test
+end </p>
+
+<p>a = Test.new
+b = Test.new</p>
+
+<p>def a.method_unique_to_this_instance
+   puts 'Unique'
+end</p>
+
+<p>a.unique # Unique
+b.unique # NoMethodError</p>
+
+<p>```</p>
+
+<p>In this situation, an anonymous <em>Eigenclass</em> is created to house the singleton method and inserted as the class of <code>a</code>, with its superclass pointing at its original class. This class is also hidden from us. Calling <code>a.class</code> returns its original superclass.</p>
+
+<p>This means that methods added to a <em>class</em> are also done so using anonymous classes because they are added to the shared class object using <code>self</code>:</p>
+
+<p>```
+class Test</p>
+
+<p>def self.some_class_method
+   end</p>
+
+<p>def Test.some_other_class_method
+   end</p>
+
+<p>end
+```</p>
+
+<p>In both these situations, an Eigenclass is created housing these methods and set to <code>Test</code>'s parent class.</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

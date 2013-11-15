@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Asset Sync</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,24 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Use the built-in-initializer to configure asset-sync. This means it pulls its parameters from environmental variables rather than a `config/initializer or a config file.</p>
+
+<p>Add the following envs to Heroku using <code>$ heroku config:add XXXX=XXXX</code></p>
+
+<p><code>
+AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXX
+AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+FOG_DIRECTORY=XXXXXXX
+FOG_PROVIDER=AWS
+ASSET_SYNC_GZIP_COMPRESSION=true
+FOG_REGION=eu-west-1
+</code></p>
+
+<p><em>If there are already files synced when you add <code>ASSET_SYNC_GZIP_COMPRESSION=true</code> you will need to delete everything from S3 and re-sync.</em></p>
+
+<p>*You must set '$ heroku labs:enable user-env-compile -a XXXXAPPNAMEXXXX` or it won't work and you'll get errors from Asset Sync regarding missing Fog Provider / Bucket *</p>
+
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

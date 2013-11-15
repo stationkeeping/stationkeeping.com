@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Angular Project Setup</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,114 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h1 id="new-project-setup">New project setup</h1>
+
+<h3 id="client">Client</h3>
+
+<ol>
+  <li>Make sure you have <a href="http://nodejs.org">node</a></li>
+  <li>Install Yeoman, Grunt, Bower and Karma: <code>sudo npm install -g yo grunt-cli bower karma</code></li>
+  <li>Install the Yeoman Angular generators: <code>sudo npm install -g generator-angular</code></li>
+  <li>Create the dir for the project: <code>mkdir myapp &amp;&amp; cd $_</code></li>
+  <li>Run the Yeoman Angular generator: <code>yo angular</code></li>
+  <li>To connect to the rails api using a proxy: <code>npm install --save-dev grunt-connect-proxy</code></li>
+  <li>Configure Gruntfile like <a href="https://gist.github.com/newtriks/7010253">this</a></li>
+</ol>
+
+<h3 id="server">Server</h3>
+
+<ol>
+  <li>
+    <p>Set an application configuration variable in the <em>config.yml</em>:</p>
+
+    <pre><code> common: &amp;common
+    client:
+      origin: http://localhost
+</code></pre>
+  </li>
+  <li>
+    <p>To enable CORS for a public api within our <code>Api::BaseController</code> which extends <code>ActionController::Base</code> add the following:</p>
+
+    <pre><code> before_filter :set_cors_headers
+ before_filter :cors_preflight
+ respond_to :json
+
+ def set_cors_headers
+   headers['Access-Control-Allow-Origin'] = AppConfig.config[:client]['origin']
+   headers['Access-Control-Allow-Methods'] = 'GET'
+   headers['Access-Control-Allow-Headers'] = '*'
+   headers['Access-Control-Max-Age'] = "3628800"
+ end
+
+ def cors_preflight
+   head(:ok) if request.method == :options
+ end
+</code></pre>
+  </li>
+</ol>
+
+<h1 id="existing-project-set-up">Existing project set up</h1>
+
+<ol>
+  <li>Clone the repos</li>
+  <li>Install dependencies: <code>npm install &amp;&amp; bower install</code></li>
+</ol>
+
+<h1 id="running-the-app">Running the app</h1>
+
+<ol>
+  <li><strong>API</strong> Terminal window one in app dir: <code>rails s</code></li>
+  <li><strong>Client</strong> Terminal window two in app dir: <code>grunt server</code></li>
+</ol>
+
+<h1 id="general-logic">General logic</h1>
+
+<h3 id="generating">Generating</h3>
+
+<p>To generate classes simply use Yeoman's angular <a href="https://github.com/yeoman/generator-angular#generators">generators</a> e.g. <code>yo angular:directive placeholder</code> generates:</p>
+
+<pre><code>  create app/scripts/directives/placeholder.js
+  create test/spec/directives/placeholder.js
+</code></pre>
+
+<h3 id="modules">Modules</h3>
+
+<p>Individual file has it's own <em>module</em> and are named with their type then name  e.g. <code>directives.player</code>.</p>
+
+<ul>
+  <li>Register with the app itself by adding it to the module dependencies array within <em>app.js</em>: <code>angular.module('playerApp', ['directives.player']);</code></li>
+  <li>Within the class itself ensure a new module is created by including the array syntax and include any dependencies <em>if</em> they are not already included on a global level with the app (in app.js as detailed above): <code>angular.module('directives.player', [])</code>.</li>
+</ul>
+
+<h3 id="testing">Testing</h3>
+
+<p>Example <a href="https://gist.github.com/stationkeeping/7010704">karma.conf.js</a>.</p>
+
+<p>For standalone running of the test suite i.e. if there is no server running, use <code>grunt test:unit</code> or for all e2e tests use <code>grunt test:e2e</code>.</p>
+
+<p>To run the test suite alongside a running server and have Karma autowatch file changes then re-run all tests use <code>karma start</code> in another terminal window.</p>
+
+<h3 id="grunt">Grunt</h3>
+
+<p><strong>Tasks</strong></p>
+
+<ul>
+  <li><code>grunt server</code> runs the app on localhost and opens in browser</li>
+  <li><code>grunt test:unit</code> runs the unit tests</li>
+  <li><code>grunt test:e2e</code> runs the end to end tests</li>
+  <li><code>grunt stylus</code> compiles the stylus files to css</li>
+  <li><code>grunt build</code> generates a build directory in the project and compiles down the project i.e. minifying etc into a release build</li>
+  <li><code>grunt jshint</code> runs jshint on all js files outputting any errors to console</li>
+</ul>
+
+<p><strong>Integrating <a href="http://learnboost.github.io/stylus/">Stylus</a></strong></p>
+
+<ol>
+  <li>Install Stylus: <code>npm install stylus</code></li>
+  <li>Install the <a href="https://github.com/gruntjs/grunt-contrib-stylus">Stylus Grunt plugin</a>: <code>npm install grunt-contrib-stylus --save-dev</code></li>
+  <li>Update the Gruntfile.js as detailed in this <a href="https://gist.github.com/newtriks/7010253/revisions">gist revision</a></li>
+</ol>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

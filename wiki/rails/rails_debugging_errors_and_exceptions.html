@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Rails Debugging Errors And Exceptions</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,45 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p><strong>Don't use minified vendor CSS/JS files. They are often missing important debug messages and using a debugger is unpleasant. When you precompile your assets <em>they will all be minifed anyway</em>.</strong></p>
+
+<h4 id="better-errors">Better Errors</h4>
+<p>Better Errors gives much more useful error pages, allowing you to drill down through the stack, jumping to the source file and embeds a console so you can investigate the application live.</p>
+
+<p>Use <code>better_errors</code> and <code>binding_of_caller</code> gems:</p>
+
+<p><code>
+gem 'better_errors'
+gem 'binding_of_caller'
+</code></p>
+
+<p>To see the last exception: <code>{base_url}__better_errors</code></p>
+
+<p>To customise the editor that is opened from Better Errors, add a <code>better_errors.rb</code> initialiser:</p>
+
+<p><code>
+BetterErrors.editor = :sublime if defined? BetterErrors
+</code></p>
+
+<h4 id="rails-panel">Rails Panel</h4>
+<p>Rails Panel adds a new tab to Chrome Developer Tools called <em>Rails</em>, that displays both HTML and JavaScript requests within your Rails app.</p>
+
+<p>You need to add the <em>Meta Request</em> gem to your Gemfile:</p>
+
+<p><code>
+gem 'meta_request'
+</code></p>
+
+<p>And install the Chrome Extension.</p>
+
+<p>To set Sublime Text as the editor linked to the Plugin, choose Sublime from: <code>Chrome &gt; Prefs &gt; Extensions &gt; Rails Panel</code> and install <code>[SublimeText 2 URLHandler](https://github.com/asuth/subl-handler)' which enables support for </code>subl://` URLs.</p>
+
+<p>Check Speed of gem load (loads and runs gist found <a href="https://gist.github.com/panthomakos/2588879">here</a>:</p>
+
+<p><code>
+bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.rb)" | sort -n -k4
+</code></p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

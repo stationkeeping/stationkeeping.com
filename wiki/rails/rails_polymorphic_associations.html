@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Rails Polymorphic Associations</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,91 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Polymorphic associations allow a single model to belong to multiple models of different classes <em>via the same association</em> rather than it maintaining a separate association to each type of model.</p>
+
+<h4 id="hasmany">has_many</h4>
+
+<p>Two different models that both need to be rateable, <code>One</code> and <code>Two</code>:</p>
+
+<p>```
+class One &lt; ActiveRecord::Base
+  has_many :ratings, :as =&gt; :rateable
+end</p>
+
+<p>class Two &lt; ActiveRecord::Base
+  has_many :ratings, :as =&gt; :rateable
+end
+```</p>
+
+<p>And a single <code>Rating</code> model:</p>
+
+<p><code>
+class Rating &lt; ActiveRecord::Base
+  belongs_to :rateable, polymorphic: true
+end
+</code></p>
+
+<p>The models that need to share an association class declare that they are <code>polymorphic</code> using <code>as</code> along with the polymorphic name:</p>
+
+<p><code>
+has_many :ratings, :as =&gt; :rateable
+</code></p>
+
+<p>And the model that they are sharing declares a single <code>belongs_to</code> association, with the same polymorphic name:</p>
+
+<p><code>
+belongs_to :rateable, polymorphic: true
+</code></p>
+
+<p>To support this association in the underlying tables, on the model class shared between the polymorphic models, two columns are needed. The first; <code>rateable</code> stores the <code>id</code> of whichever polymorphic <code>rateable</code> model satisfies the association. The second column; <code>rateable_type</code> specifies the class of the model. Both can be generated using:</p>
+
+<p>```
+class CreateRatings &lt; ActiveRecord::Migration
+  def self.up
+    create_table :comments do |t|
+      t.references :rateable, :polymorphic =&gt; true
+   end</p>
+
+<p>add_index :comments, [:commentable_id, :commentable_type]
+end
+```</p>
+
+<h4 id="hasmany-through">has_many through</h4>
+
+<p>Two different models that both need to be rateable through rating_assignment, <code>One</code> and <code>Two</code>:</p>
+
+<p>```
+class One &lt; ActiveRecord::Base
+  has_many :rating_assignments, :as =&gt; :rateable
+  has_many :ratings, through :rating_assignments
+end</p>
+
+<p>class Two &lt; ActiveRecord::Base
+  has_many :rating_assignments, :as =&gt; :rateable
+  has_many :ratings, through :rating_assignments
+end
+```</p>
+
+<p>A Rating Assignment model:</p>
+
+<p><code>
+class RatingAssignment
+   belongs_to :rateable, polymorphic: true
+   belongs_to :rateable
+end
+</code></p>
+
+<p>And a single <code>Rating</code> model:</p>
+
+<p><code>
+class Rating &lt; ActiveRecord::Base
+  has_many :rating_assignments
+  has_many :ones, through: rating_assignments, source: :rateable, source_type: "One"
+  has_many :twos, through: rating_assignments, source: :rateable, source_type: "Two"
+end
+</code></p>
+
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

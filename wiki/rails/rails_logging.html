@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Rails Logging</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,33 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Access the logger anywhere using <code>Rails.logger</code>.</p>
+
+<p>To create a logger:</p>
+
+<p><code>
+require 'logger'
+logger = Logger.new STDOUT
+</code></p>
+
+<p>Logs are saved to <code>logs</code> with a separate file per environment. To clear all logs:</p>
+
+<p><code>
+$ rake log:clear
+</code></p>
+
+<p>To tail the development log:</p>
+
+<p><code>
+$ tail -f log/development.log
+</code></p>
+
+<p>Or using the <em>Powder</em> gem:</p>
+
+<p><code>
+$ powder applog
+</code></p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

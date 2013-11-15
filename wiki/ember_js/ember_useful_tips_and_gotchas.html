@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Ember Useful Tips And Gotchas</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,54 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p><a href="http://emberjs.com/guides/understanding-ember/the-view-layer/#toc_adding-new-events">List of DOM events</a></p>
+
+<p>See all the Templates Ember knows about in the application: </p>
+
+<p><code>
+$ Ember.TEMPLATES
+</code></p>
+
+<p>Set the template used by the application:</p>
+
+<p><code>
+ExampleApp.ApplicationView = Ember.View.extend({
+  templateName: 'news_items/application'
+});
+</code></p>
+
+<p>Set the element to append the app template to:</p>
+
+<p><code>
+ExampleApp = Ember.Application.create({
+  rootElement: $('#example-container')
+});
+</code></p>
+
+<p>Tell Ember how to correctly pluralize a Model:</p>
+
+<p><em>In <code>store.js</code></em></p>
+
+<p><code>
+DS.RESTAdapter.configure('plurals', {example:'examples'});
+</code></p>
+
+<p>Bind the disabled property of a button to the number of items in an ArrayController, so that if there are no items, the button is disabled:</p>
+
+<p><code>
+&lt;button {{action clearAll}} {{bindAttr disabled="anyEntries"}}&gt;Clear All&lt;/button&gt;
+</code></p>
+
+<p><code>
+  anyEntries: function() {
+    return this.content.get('length') == 0;
+  }.property('content.length'),
+</code></p>
+
+<p><em>I'm creating new models, but the view isn't updating, even when I refresh. However the models are there.</em></p>
+
+<p>This is probably an issue with the Route. It isn't passing the Models to the COntroller correctly.</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

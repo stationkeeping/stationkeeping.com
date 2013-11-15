@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Project Management Workflow</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,32 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <h2 id="use-trellohttpstrellocom--githubhttpsgithubcom">Use <a href="https://trello.com/">Trello</a> &amp; <a href="https://github.com">Github</a></h2>
+
+<p>Setup the following lists:</p>
+
+<ol>
+  <li>Todo</li>
+  <li>Doing</li>
+  <li>Done</li>
+  <li>Q&amp;A</li>
+  <li>Verified</li>
+</ol>
+
+<h3 id="workflow">Workflow</h3>
+
+<ol>
+  <li>Create cards in the <em>todo</em> list specific to project tasks and assign to a user. </li>
+  <li>When a user begins the task they drag it into <em>doing</em>.</li>
+  <li>Create a new git branch (off master) using the card name for the branch name.</li>
+  <li>On completion of the task, drag the card into the <em>done</em> list (trello) and send a <em>pull request</em> (git).</li>
+  <li>Another user then verifies the pull request, merges the branch into master (git) and then drags the card into the <em>verified</em> list (trello).</li>
+</ol>
+
+<h3 id="tips">Tips</h3>
+
+<p>Setup <a href="https://twitter.com/trello">@trello</a> as an OS X app using <a href="http://www.lessannoyingcrm.com/articles/240/Updates_to_Mac_Chrome_application_shortcuts_and_the_iOS_fullscreen_webapp_generator">Mac Chrome application shortcut generator</a>, plus a tasty <a href="http://cl.ly/GZcm">icon</a>. </p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

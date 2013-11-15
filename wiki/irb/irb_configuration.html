@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>IRB Configuration</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,30 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>The IRB equivalent of <code>.bash_rc</code> / <code>.bash_profile</code> is <code>~/.irbrc</code>.</p>
+
+<p>Example <a href="https://github.com/logankoester/irbrc/blob/master/irbrc">file</a>. </p>
+
+<p>```
+require 'rubygems'</p>
+
+<p>require 'ap' # Awesome Print
+require 'net-http-spy' # Print information about any HTTP requests being made</p>
+
+<h1 id="ascii-table-views">ASCII table views</h1>
+<p>require 'hirb/import_object'
+Hirb.enable
+extend Hirb::Console</p>
+
+<h1 id="enable-coloured-output">Enable coloured output</h1>
+<p>require 'wirble'
+Wirble.init
+Wirble.colorize</p>
+
+<h1 id="bash-like-tab-completion">Bash-like tab completion</h1>
+<p>require 'bond'; Bond.start
+```</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">

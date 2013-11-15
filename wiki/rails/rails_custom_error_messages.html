@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Stationkeeping</title>
+        <title>Rails Custom Error Messages</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,7 +29,55 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    
+                    <p>Tell rails that you want to handle errors with Routes:</p>
+
+<p><code>
+config.exceptions_app = self.routes
+</code></p>
+
+<p>To actually see the errors in development:</p>
+
+<p><code>
+config.consider_all_requests_local = false
+</code></p>
+
+<p>Delete static error pages from <code>public</code>.</p>
+
+<p>Add to routes (above any catch-all matchers like High Voltage's <code>page#show</code>):</p>
+
+<p><code>
+# Exceptions
+match '/404' =&gt; 'exceptions#error_404'
+match '/422' =&gt; 'exceptions#error_422'
+match '/500' =&gt; 'exceptions#error_500'
+</code></p>
+
+<p>Create the exceptions controller:</p>
+
+<p>```
+class ExceptionsController &lt; ApplicationController</p>
+
+<p>layout "application"</p>
+
+<p>respond_with :html</p>
+
+<p>def error_404
+    render status: :not_found
+  end</p>
+
+<p>def error_422
+    render status: :unprocessable_entity
+  end</p>
+
+<p>def error_500
+    render status: :internal_server_error
+  end</p>
+
+<p>end
+```</p>
+
+<p>Create views for each exception.</p>
+
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">
