@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Polymorphic Associations</title>
+        <title>Rails Controllers</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,89 +31,173 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>Polymorphic associations allow a single model to belong to multiple models of different classes <em>via the same association</em> rather than it maintaining a separate association to each type of model.</p>
+                    <p>Much of <code>ActionController</code> is implemented in Rack, as a series of filters. Other gems like <em>Warden</em> and <em>BetterErrors</em> are also written as Rack filters. Sometimes these filters are a way of tying gem functionality into Rack rather than the functionality existing entirely within Rack.</p>
 
-<h4 id="hasmany">has_many</h4>
+<p>Show Rack Filters used by an application:</p>
 
-<p>Two different models that both need to be rateable, <code>One</code> and <code>Two</code>:</p>
+<p><code>
+$ rake middleware
+</code></p>
+
+<h4 id="request-flow">Request Flow</h4>
+
+<h5 id="dispatching">Dispatching</h5>
+
+<p>The <code>routes.rb</code> file generates a <code>ActionDispatch::Routing::RouteSet</code> via the call to <code>Example::Application.routes.draw do</code>. The RouteSet is used to find a matching route and determine its <em>Rack Endpoint</em>. If the endpoint is a controller action, the associated dispatcher then invokes this action. All Controller actions are <em>Rack Endpoints</em>, but the endpoint could also be another Rack app, a redirect macro, or a lambda.</p>
+
+<p>To manually invoke a dispatcher:</p>
+
+<p><code>
+&gt;&gt; env = {}
+&gt;&gt; env['REQUEST_METHOD'] = 'GET'
+&gt;&gt; env['PATH_INFO'] = '/example/index'
+&gt;&gt; env['rack.input'] = StringIO.new
+ActionController::Dispatcher.new.call(env).last.body # For the response body
+</code></p>
+
+<p>A controller's implementation of an action allows for custom handling, however, if no implementation for the action exists or the implementation is empty, it is assumed a view exists, so Rails looks for the view to render. If an action is missing, empty or no rendering is specified, Rails will do the equivalent of:</p>
+
+<p><code>
+render "example/index"
+</code></p>
+
+<h5 id="rendering">Rendering</h5>
+
+<p>Rendering is the last piece of the request flow.</p>
+
+<p>A controller action can render the template for a different action (for example an <code>update</code> action can render an <code>edit</code> action template if a form fails to validate):</p>
+
+<p><code>
+def update
+ render action: :update
+end
+</code></p>
+
+<p>This will render the <code>update</code> template, but will not call the <code>update</code> action, so whatever the template needs must be made available to it.</p>
+
+<p>To render an explicit template:</p>
+
+<p><code>
+render template: '/example/update.html.erb'
+</code></p>
+
+<p>To render JSON (assuming whatever is passed has a <code>to_json</code> method):</p>
+
+<p><code>
+render json: @example
+</code></p>
+
+<p>or with a JSONP callback:</p>
+
+<p><code>
+render json: @example, callback: "example_callback"
+</code></p>
+
+<p>To render nothing:</p>
+
+<p><code>
+render :nothing =&gt; true, :status =&gt; 401
+</code></p>
+
+<h6 id="other-options">Other options</h6>
+
+<p>Mime type: <code>:content—type</code>
+Layout: <code>:layout</code>
+Status: <code>:status</code></p>
+
+<h5 id="redirecting">Redirecting</h5>
+
+<p>Redirecting breaks the flow of the current request flow and initiates another one.</p>
+
+<p>Redirect using controller action:</p>
+
+<p><code>
+redirect_to action: show, id: 4
+</code></p>
+
+<p>Or using a model (in which case <code>url_for</code> is called on it)</p>
+
+<p><code>
+redirect_to @example
+</code></p>
+
+<p>Or a URL (hardcoded or in the form of a URL helper).</p>
+
+<p>Or <code>:back</code> which will return to the page that issued the request (the request's <code>HTTP_REFERER</code>) :</p>
+
+<p><code>
+redirect_to :back
+</code></p>
+
+<p>A flash message can also be passed (using <code>status:</code>, <code>alert:</code> or a hash value for <code>flash:</code>:</p>
+
+<p><code>
+redirect_to example_url(@example), alert: "Nope"
+</code></p>
+
+<p>An action will continue executing after a redirect, and will end up rendering a view, causing a <code>DoubleRenderError</code> </p>
+
+<h4 id="filters">Filters</h4>
+
+<p>Filters are declared at the top of a controller, and are run in the order they are declared. They can be declared together:</p>
+
+<p><code>
+before_filter :foo, :bar
+</code></p>
+
+<p>Or separately:</p>
 
 <p>```
-class One &lt; ActiveRecord::Base
-  has_many :ratings, :as =&gt; :rateable
+before_filter :foo
+before_filter :bar</p>
+
+<p>```</p>
+
+<p>A filter is usually a method, but could also be a class which is scoped to the controller with full access to its methods:</p>
+
+<p>```
+class ExampleFilter
+  def self.after(controller)
+    # Do something
+  end
 end</p>
 
-<p>class Two &lt; ActiveRecord::Base
-  has_many :ratings, :as =&gt; :rateable
+<p>class ExampleController &lt; ActionController::Base
+  after_filter ExampleFilter
 end
 ```</p>
 
-<p>And a single <code>Rating</code> model:</p>
+<p>A filter can also take the form of a block, executed in the context of the controller:</p>
 
 <p><code>
-class Rating &lt; ActiveRecord::Base
-  belongs_to :rateable, polymorphic: true
+before_filter do
+   # Do something
 end
 </code></p>
 
-<p>The models that need to share an association class declare that they are <code>polymorphic</code> using <code>as</code> along with the polymorphic name:</p>
+<p>Filters can also be prepended using: <code>prepend_before_filter</code> and <code>prepend_after_filter</code>, or wrapped around an action using <code>around_filter</code>.</p>
+
+<p>To skip a filter defined on a superclass:</p>
 
 <p><code>
-has_many :ratings, :as =&gt; :rateable
+skip_before_filter :example_filter
 </code></p>
 
-<p>And the model that they are sharing declares a single <code>belongs_to</code> association, with the same polymorphic name:</p>
+<p>Filters can be made action-specific using:</p>
 
 <p><code>
-belongs_to :rateable, polymorphic: true
+before_filter :example_filter, :only =&gt; [:edit, :delete]
 </code></p>
 
-<p>To support this association in the underlying tables, on the model class shared between the polymorphic models, two columns are needed. The first; <code>rateable</code> stores the <code>id</code> of whichever polymorphic <code>rateable</code> model satisfies the association. The second column; <code>rateable_type</code> specifies the class of the model. Both can be generated using:</p>
+<p>Calling <code>render</code> or <code>redirect_to</code> from a filter will halt execution of all other filters.</p>
 
-<p>```
-class CreateRatings &lt; ActiveRecord::Migration
-  def self.up
-    create_table :comments do |t|
-      t.references :rateable, :polymorphic =&gt; true
-   end</p>
+<h5 id="send-data">Send Data</h5>
 
-<p>add_index :comments, [:commentable_id, :commentable_type]
-end
-```</p>
+<p>Textual or binary data can be sent to the client in a buffer and set either to be downloaded or to be displayed inline using <code>send_data</code>.</p>
 
-<h4 id="hasmany-through">has_many through</h4>
+<h5 id="send-file">Send File</h5>
 
-<p>Two different models that both need to be rateable through rating_assignment, <code>One</code> and <code>Two</code>:</p>
-
-<p>```
-class One &lt; ActiveRecord::Base
-  has_many :rating_assignments, :as =&gt; :rateable
-  has_many :ratings, through :rating_assignments
-end</p>
-
-<p>class Two &lt; ActiveRecord::Base
-  has_many :rating_assignments, :as =&gt; :rateable
-  has_many :ratings, through :rating_assignments
-end
-```</p>
-
-<p>A Rating Assignment model:</p>
-
-<p><code>
-class RatingAssignment
-   belongs_to :rateable, polymorphic: true
-   belongs_to :rateable
-end
-</code></p>
-
-<p>And a single <code>Rating</code> model:</p>
-
-<p><code>
-class Rating &lt; ActiveRecord::Base
-  has_many :rating_assignments
-  has_many :ones, through: rating_assignments, source: :rateable, source_type: "One"
-  has_many :twos, through: rating_assignments, source: :rateable, source_type: "Two"
-end
-</code></p>
+<p><code>send_file</code> is similar to <code>send_data</code>, but rather than using data, it references a pre-existing file and hands off the writing of the file to the server, rather than Rails taking care of it itself. </p>
 
 
                 </div>
@@ -222,7 +306,27 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -377,71 +481,71 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -452,7 +556,7 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -463,15 +567,15 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -482,11 +586,11 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

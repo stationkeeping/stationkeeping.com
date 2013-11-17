@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Settings And Startup</title>
+        <title>Rails Polymorphic Associations</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,107 +31,90 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>When running a Rails app (via <code>runner</code>, <code>console</code>, <code>server</code>)</p>
+                    <p>Polymorphic associations allow a single model to belong to multiple models of different classes <em>via the same association</em> rather than it maintaining a separate association to each type of model.</p>
 
-<ol>
-  <li>boot.rb sets up Bundler and load paths</li>
-  <li>application.rb loads rails gems, gems for the specified Rail.env, and configures the application</li>
-  <li>environment.rb runs all initializers</li>
-</ol>
+<h4 id="hasmany">has_many</h4>
 
-<h4 id="applicationrb">Application.rb</h4>
+<p>Two different models that both need to be rateable, <code>One</code> and <code>Two</code>:</p>
 
-<p>Is required by <code>environment.rb</code> and configures the application.</p>
+<p>```
+class One &lt; ActiveRecord::Base
+  has_many :ratings, :as =&gt; :rateable
+end</p>
 
-<p>It loads all the rails components using <code>require 'rails/all</code>, but this can be replaced with individual components as desired.</p>
+<p>class Two &lt; ActiveRecord::Base
+  has_many :ratings, :as =&gt; :rateable
+end
+```</p>
 
-<p>Anything it sets can be overridden in environment-specific files. </p>
-
-<p>Add non-default groups for use in <code>Gemfile</code>:</p>
+<p>And a single <code>Rating</code> model:</p>
 
 <p><code>
-if defined?(Bundler)
-  # For custom groups, define which environments they should be included in
-  groups = {
-    assets: %w(development test),
-  }
-  Bundler.require(:security, :model, :view, *Rails.groups(groups))
+class Rating &lt; ActiveRecord::Base
+  belongs_to :rateable, polymorphic: true
 end
 </code></p>
 
-<p>Add other non-standard folders to Rails's class path:</p>
+<p>The models that need to share an association class declare that they are <code>polymorphic</code> using <code>as</code> along with the polymorphic name:</p>
 
 <p><code>
-config.autoload_paths += %W(#{config.root}/app/models/forms)
+has_many :ratings, :as =&gt; :rateable
 </code></p>
 
-<p>Set timezone:</p>
+<p>And the model that they are sharing declares a single <code>belongs_to</code> association, with the same polymorphic name:</p>
 
 <p><code>
-config.time_zone = "London"
+belongs_to :rateable, polymorphic: true
 </code></p>
 
-<p>Add folders or files for precompilation if they aren't referenced in <code>application.css</code> or <code>application.js</code>.</p>
+<p>To support this association in the underlying tables, on the model class shared between the polymorphic models, two columns are needed. The first; <code>rateable</code> stores the <code>id</code> of whichever polymorphic <code>rateable</code> model satisfies the association. The second column; <code>rateable_type</code> specifies the class of the model. Both can be generated using:</p>
+
+<p>```
+class CreateRatings &lt; ActiveRecord::Migration
+  def self.up
+    create_table :comments do |t|
+      t.references :rateable, :polymorphic =&gt; true
+   end</p>
+
+<p>add_index :comments, [:commentable_id, :commentable_type]
+end
+```</p>
+
+<h4 id="hasmany-through">has_many through</h4>
+
+<p>Two different models that both need to be rateable through rating_assignment, <code>One</code> and <code>Two</code>:</p>
+
+<p>```
+class One &lt; ActiveRecord::Base
+  has_many :rating_assignments, :as =&gt; :rateable
+  has_many :ratings, through :rating_assignments
+end</p>
+
+<p>class Two &lt; ActiveRecord::Base
+  has_many :rating_assignments, :as =&gt; :rateable
+  has_many :ratings, through :rating_assignments
+end
+```</p>
+
+<p>A Rating Assignment model:</p>
 
 <p><code>
-config.assets.precompile += "precompile/*.js"
+class RatingAssignment
+   belongs_to :rateable, polymorphic: true
+   belongs_to :rateable
+end
 </code></p>
 
-<p>You can also set up ActiveRecord Observers, Generators and Localisation.</p>
-
-<h5 id="other-settings">Other settings</h5>
-
-<h6 id="autoload">Autoload</h6>
-
-<p>By default, Rails performs <em>automatic class reloading</em>, meaning it reloads classes for every request, picking up any changes made. It does this by using <code>load</code> instead of <code>require</code> (which would only load a class the first time it is encountered).</p>
-
-<p>To see the load path:</p>
+<p>And a single <code>Rating</code> model:</p>
 
 <p><code>
-$LOAD_PATH
+class Rating &lt; ActiveRecord::Base
+  has_many :rating_assignments
+  has_many :ones, through: rating_assignments, source: :rateable, source_type: "One"
+  has_many :twos, through: rating_assignments, source: :rateable, source_type: "Two"
+end
 </code></p>
 
-<p><code>lib</code> is not added to the autoload path, though it is added to the <code>$LOAD_PATH</code>. Files in <code>lib</code> need to be referenced using <code>require</code>. Or can be added to the autoload path using:</p>
-
-<p><code>
-config.autoload_paths += %W(#{config.root}/lib/*)
-</code></p>
-
-<p>This autoloading functionality is configured using:</p>
-
-<p><code>
-config.cache_classes = false
-</code></p>
-
-<h6 id="errors">Errors</h6>
-
-<p>Rails supplies useful error messages in local development. To display these messages on a remote machine:</p>
-
-<p><code>
-config.consider_all_requests_local = true
-</code></p>
-
-<h6 id="caching">Caching</h6>
-
-<p>By default, caching is turned off:</p>
-
-<p><code>
-config.action_controller.perform_caching = false
-</code></p>
-
-<h6 id="mail">Mail</h6>
-
-<p>Prevent mailer from raising an error if it can't send, for example if the development environment is not able to send mail:</p>
-
-<p><code>
-config.action_mailer.raise_delivery_errors = false
-</code></p>
-
-<p>Or prevent it even trying (mails are still logged)</p>
-
-<p><code>
-config.action_mailer.perform_deliveries = false
-</code></p>
 
                 </div>
                 <div class="secondary">
@@ -239,7 +222,27 @@ config.action_mailer.perform_deliveries = false
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -394,71 +397,71 @@ config.action_mailer.perform_deliveries = false
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -469,7 +472,7 @@ config.action_mailer.perform_deliveries = false
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -480,15 +483,15 @@ config.action_mailer.perform_deliveries = false
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -499,11 +502,11 @@ config.action_mailer.perform_deliveries = false
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

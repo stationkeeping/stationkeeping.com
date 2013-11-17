@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Debugging Using Console</title>
+        <title>Rails Prelaunch Check</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,49 +31,24 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>Open/close with <code>Alt / Cmd / I</code></p>
+                    <h4 id="sensitive-parameters">Sensitive Parameters</h4>
 
-<h5 id="console">Console</h5>
-
-<p>Use assertions in the source to check application state:</p>
+<p>Check that any sensitive params are filtered out of the logs. By default in <code>config/application.rb</code>:</p>
 
 <p><code>
-console.assert(1 == 9); // Raises Exception
+config.filter_parameters += [:password]
 </code></p>
 
-<p>Inspect an object using <code>inspect</code>:</p>
+<p>Add any others e.g.</p>
 
 <p><code>
-$ inspect(exampleObject)
+config.filter_parameters += [:password_confirmation]
 </code></p>
 
-<p>Get a reference to the last selected element in the DOM using <code>$0</code> and previous items with <code>$1</code>, <code>$2</code>, <code>$3</code> etc.</p>
+<h4 id="database-indexes">Database Indexes</h4>
 
-<h5 id="breaking-on-exceptions">Breaking on Exceptions</h5>
+<p>Check that all foreign key database columns have an index. Note that sometimes these are added implicitly.</p>
 
-<p>Sources Tab &gt; Console</p>
-
-<p>Pause button has three modes:</p>
-
-<ul>
-  <li>[Blue] Break on any exception</li>
-  <li>[Purple] Break on uncaught exception</li>
-  <li>[Black] Don't break</li>
-</ul>
-
-<h5 id="opening-debugger-at-point-in-code">Opening Debugger At Point In Code</h5>
-
-<p>Add <code>debugger;</code> at the point in your code you want to debug. When the execution hits that line the application will break.</p>
-
-<h5 id="look-at-an-objects-structure-from-the-console">Look at an object's structure from the console</h5>
-
-<p>Some objects, like classes only show up as strings, but you can inspect the object properly using:</p>
-
-<p><code>
-$ dir(someClass)
-</code></p>
-
-<p>Shift-click refresh to reload the page, bypassing the cache.</p>
 
                 </div>
                 <div class="secondary">

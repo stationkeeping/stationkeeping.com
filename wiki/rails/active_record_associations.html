@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Active Record</title>
+        <title>Rails Active Record Associations</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,299 +31,72 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>An Active Record instance is an object wrapping a database row. It uses the row's <code>id</code> (integer) attribute as the primary key. Rails uses the class name to infer the table name.</p>
-
-<p>List tables</p>
+                    <p>Associations are exposed as methods, and behind the scenes an association is implemented as an <code>AssociationProxy</code>. The proxy delegates most instance methods to the actual association (a ruby object or Array). <code>AssociationProxy</code> is actually the base class for a class specific to the association, with a:</p>
 
 <p><code>
-ActiveRecord::Base.connection.tables
+AssociationProxy
+   - BelongsToAssociation
+   - HasOneAssociation
+   - BelongsToPolymorphicAssociation
+   - AssociationCollection 
+      - HasAndBelongsToMany
+      - HasManyAssociation
+      - HasManyThroughAssociation
+      - HasOneThroughAssociation
 </code></p>
 
-<p>List database columns:</p>
+<h4 id="indexes">Indexes</h4>
+
+<p>Add indexes to any foreign key columns in a migration:</p>
 
 <p><code>
-Example.column_names
+add_index :example, :foo_id
 </code></p>
 
-<h4 id="macros--dsl-declarations">Macros / DSL Declarations</h4>
+<h5 id="counter-cache">Counter Cache</h5>
 
-<p>Macros are just bracketless method invocations called on the class object, and add functionality to it at runtime:</p>
+<p>Getting the number of items in a relationship is usually an expensive database operation, needing multiple hits:</p>
 
 <p><code>
-has_many :examples
-has_many :foo, through: :bar
+owner.belongings.length
 </code></p>
 
-<p>Is analogous to:</p>
+<p>A counter cache tracks the number of items in a belongs_to relationship, ensuring the value is available on the owning instance. It is declared on the belonging member:</p>
 
 <p><code>
-has_many(:examples)
-has_many(:foo, through: :bar)
+belongs_to :foo, counter_cache: true
 </code></p>
 
-<h4 id="creation">Creation</h4>
-
-<p>Create an ActiveRecord:</p>
+<p>And a column must be added to the owning member with a default value of 1:</p>
 
 <p><code>
-example = Example.new(foo: 33, bar: "something")
+add_column :owners, :belongers_count, :integer, default: 0
 </code></p>
 
-<p>Check whether it has ever been saved:</p>
+<p>It is used on the owning menber:</p>
 
 <p><code>
-example.persisted?
+owner.belongings_count
 </code></p>
 
-<p>Or opposite:</p>
+<h5 id="using-associations-named-differently-to-the-class-they-refer-to">Using Associations Named Differently To The Class THey Refer To</h5>
+
+<p>Sometimes it may be necessary to name an association differently, for example, a relationship might be named <code>latest_foo</code>, but refer to <code>foo</code>. In this case, the <code>class_name</code> can be set:</p>
 
 <p><code>
-example.new_record?
+has_one :latest_foo, class_name: :foo
 </code></p>
 
-<p>To create and save in one hit:</p>
+<p>It's OK to have both a <code>has_many</code> and a <code>has_one</code> to the same model, sharing a primary key:</p>
 
 <p><code>
-example = Example.create!(foo: 33, bar: "something")
-</code></p>
-
-<p>Both <code>create</code> and <code>new</code> take an optional block which will be executed after attributes have been set:</p>
-
-<p><code>
-example = Example.create!(foo: 33, bar: "something") do
-   # Other configuration
-end
-</code></p>
-
-<p>To return an object if it exists or make a new one it if it doesn't:</p>
-
-<p><code>
-Example.find_or_initialize_by(name:"John")
-</code></p>
-
-<p>Or to create (new and save):</p>
-
-<p><code>
-Example.find_or_create_by(name:"John")
-</code></p>
-
-<h4 id="find">Find</h4>
-
-<p><code>first</code>, <code>last</code> and <code>all</code> are wrappers around <code>find</code>. If a single value is passed in it will be used to match an id, unless it is an Array, in which case each value will be used to match an id.</p>
-
-<h5 id="dynamic-finder-methods">Dynamic Finder Methods</h5>
-
-<p>Rails catches any missing methods using Ruby's <code>method_missing</code> callback and checks the method name to see if it starts with <code>find_by</code> or <code>find_all_by</code>. If so, it uses the rest of the method to determine what to search for, for example <code>find_by_name</code>. Multiple values can be used by adding an <code>and</code>, for example: <code>find_by_name_and_age</code>. <em>These dynamic finder methods have been deprecated in Rails 4 in favour of <code>where(name:"Smith", age:77)</code></em></p>
-
-<h5 id="where">Where</h5>
-
-<p>Where returns a chainable <code>ActiveRecordAssociation</code>.</p>
-
-<p>To find an object with a matching attribute:</p>
-
-<p><code>
-Example.where(colour: "red")
-</code></p>
-
-<p>Or for multiple:</p>
-
-<p><code>
-Example.where(colour: "red", "blue", "green")
-</code></p>
-
-<p>A string form is also available:</p>
-
-<p><code>
-Example.where("colour = :colour", colour: "red")
-Example.where("colour = :colour OR name = :name", colour: "red", name: "John")
-</code></p>
-
-<p>Which allows indirect matching:</p>
-
-<p><code>
-Example.where("colour LIKE :colour", colour: "red")
-</code></p>
-
-<h5 id="boolean-values">Boolean Values</h5>
-
-<p>Ruby will convert boolean values to the appropriate database representation.d</p>
-
-<h4 id="accessors">Accessors</h4>
-
-<p>Attributes can be read or written using dot notation, object notation (hard brackets), or ActiveRecord supports accessors to manage access to its attributes and actual read and write are done via <code>read_attribute(:example)</code> and <code>write_attribute(:example)</code>. Accessors can be overridden:</p>
-
-<p>```
-def example
-  read_attribute(:example)
-end</p>
-
-<p>def example=(new_value)
-  write_attribute(:example, new_value)
-end
-```</p>
-
-<p>All attributes can be read or written as a hash of key value pairs using <code>attributes</code>. Attribute values will not be compiled through their getters, but setting attributes will pass the values through their setters.</p>
-
-<h4 id="updating">Updating</h4>
-
-<p>For a single object:</p>
-
-<p><code>
-Example.update(id, name: "John", age: 77)
-</code></p>
-
-<p>For multiple objects:</p>
-
-<p><code>
-ids = [1,2]
-attributes = [{name:"John", age:77}, {name:"Jeff", age: 44}]
-Example.update(ids, attributes)
-</code></p>
-
-<p>The object(s) will always be validated, and an object will always be returned, even if it couldn't be saved and is invalid. To avoid having to check whether the object is valid again, use:</p>
-
-<p><code>
-if object.update_attributes(name: "John")
-   # Object was valid
-end
-</code></p>
-
-<p>There is also a singular form <code>update_attribute</code>, but values set using it will not be validated.</p>
-
-<h4 id="saving">Saving</h4>
-
-<p>Using <code>save</code> will return true or false depending on whether the save was successful. Using <code>save!</code> will raise an exception if it fails.</p>
-
-<h4 id="convenience-updaters">Convenience Updaters</h4>
-
-<p>Boolean attributes can be toggled (bypassing setter) using:</p>
-
-<p><code>
-object.toggle(active)
-</code></p>
-
-<p>Numeric attributes can be incremented or decremented using:</p>
-
-<p><code>
-object.increment(age)
-object.decrement(age)
-</code></p>
-
-<h5 id="update-updatedat-timestamp">Update updated_at timestamp</h5>
-
-<p>To update the <code>updated_at</code> timestamp to now, without firing callbacks or validations:</p>
-
-<p><code>
-object.touch
-</code></p>
-
-<p>A <code>belongs_to</code> association will automatically call <code>touch</code> on its owner if <code>touch</code> is declared on the association:</p>
-
-<p><code>
-class Bar &lt; ActiveRecord::Base
-  belongs_to :foo, touch: true
-end
-</code></p>
-
-<h4 id="destroy">Destroy</h4>
-
-<p>An <code>ActiveRecord</code> instance can be destroyed using:</p>
-
-<p><code>
-object.destroy
-</code></p>
-
-<p>One or more records can be deleted using:</p>
-
-<p><code>
-Example.destroy(1)
-Example.destroy([1, 2, 3])
-</code></p>
-
-<p>For a quicker destroy, but one that deletes the record directly without loading it as an <code>ActiveRecord</code> instance and therefore doesn't fire any <code>before_destroy</code> callbacks or delete any dependant associations:</p>
-
-<p><code>
-Example.delete(1)
-Example.delete([1, 2, 3])
-</code></p>
-
-<h4 id="ordering">Ordering</h4>
-
-<p><code>order</code> takes a SQL fragment:</p>
-
-<p><code>
-Example.order('created_at desc')
-</code></p>
-
-<h4 id="limiting">Limiting</h4>
-
-<p>Limit the maximum number of items returned by a query</p>
-
-<p><code>
-Example.limit(10)
-</code></p>
-
-<h4 id="offsetting">Offsetting</h4>
-
-<p>Offset the starting query (useful for paging):</p>
-
-<p><code>
-Example.limit(10).offset(10)
-</code></p>
-
-<h4 id="includes-eliminating-n1-queries-for-associations">Includes (Eliminating N+1 queries for associations)</h4>
-
-<p>If an <code>ActiveRecord</code> instance has associations, they can be loaded more efficiently by being included in the same request using <code>includes</code>:</p>
-
-<p>```
 class Foo
    has_many :bars
-ene</p>
-
-<blockquote>
-  <blockquote>
-    <p>foos = Foo.where(value:33).includes(:bars)
-```</p>
-  </blockquote>
-</blockquote>
-
-<p>For second degree associations:</p>
-
-<p>```
-class Foo
-   has_many :bars
-ene</p>
-
-<p>class Bar
-   has_many :amps
-ene</p>
-
-<blockquote>
-  <blockquote>
-    <p>foos = Foo.where(value:33).includes(bars: [:amps])
-```</p>
-  </blockquote>
-</blockquote>
-
-<h4 id="checking-if-an-object-exists">Checking if an object exists</h4>
-
-<p>To get a Boolean back instead of an object:</p>
-
-<p><code>
-Example.where(age: 22).exists?
+   has_one :latest_bar
+end
 </code></p>
 
-<h4 id="database-locking">Database Locking</h4>
-
-<h5 id="optimistic-locking">Optimistic Locking</h5>
-
-<p>Optimistic Locking deals with collisions after the fact and is a good solution for situations where collisions will be infrequent. To implement optimistic locking, all a record needs a is column called <code>lock_version</code>(integer). Now, in the event that more than one client edits the record simultaneously, the first to save will win, with any subsequent saves generating an <code>ActiveRecord::StaleObjectError</code>. </p>
-
-<p>The check on the <code>lock_version</code> slows down transactions a bit, and a user isn't informed of the error until after the point at which they have already lost the data.</p>
-
-<h5 id="pessimistic-locking">Pessimistic Locking</h5>
-
-<p>Pessimistic locking deals with problems before the fact by preventing a second client from editing the same row(s) in the first place. The danger of this is that something untoward happens and a lock is left in place, preventing anyone from editing the record.</p>
+<p>##### </p>
 
                 </div>
                 <div class="secondary">
@@ -431,7 +204,27 @@ Example.where(age: 22).exists?
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -586,71 +379,71 @@ Example.where(age: 22).exists?
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -661,7 +454,7 @@ Example.where(age: 22).exists?
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -672,15 +465,15 @@ Example.where(age: 22).exists?
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -691,11 +484,11 @@ Example.where(age: 22).exists?
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

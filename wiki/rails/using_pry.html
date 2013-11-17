@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Project Setup</title>
+        <title>Rails Using Pry</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,135 +31,40 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <h4 id="rails-setup">Rails Setup</h4>
+                    <p>Notes from Screencast: http://pryrepl.org/</p>
 
-<p>Create a Rails project using Postgresql for its database and skipping the creation of Test Unit files
-<code>
-$ rails new example-name -d postgresql -T
-</code></p>
-
-<p>Change directory:
-<code>
-$ cd example-name
-</code></p>
-
-<p>Add the <a href="https://github.com/stationkeeping/rails/blob/master/Gemfile">Stationkeeping Gemfile</a> as base and <em>remove what you don't need</em>.
-<code>
-curl -O https://raw.github.com/stationkeeping/rails/master/Gemfile
-</code></p>
-
-<p>Then install the Gems using:
-<code>
-$ bundle install
-</code></p>
-
-<p>Fix the Ruby version:
-<code>
-$ rbenv local 1.9.3-p194
-</code></p>
-
-<p>Drop the folder onto Sublime Text and once it's open choose: <code>Project &gt; Save Project As …</code>, saving the project inside the new Rails project folder with the same name as the project.</p>
-
-<p>Add <a href="https://github.com/stationkeeping/rails/blob/master/.gitignore">Stationkeeping .gitignore</a>.
-<code>
-curl -O https://raw.github.com/stationkeeping/rails/master/.gitignore
-</code></p>
-
-<p>Add staging environment by copying <code>config/environments/production.rb</code>:
-<code>
-$ cp -i config/environments/production.rb config/environments/staging.rb
-</code>
-<em>Now modify <code>staging.rb</code> as required.</em></p>
-
-<p>Add a <code>README</code> file:
-<code>
-$ touch README.md
-</code></p>
-
-<p>Initialise a new repository:</p>
+<p>Install:</p>
 
 <p><code>
-$ git init
+$ gem install pry pry-doc --no-ri --no-rdoc
 </code></p>
 
-<p>Add project to version control:</p>
+<p>Run:</p>
 
 <p><code>
-$ git add -A
-$ git commit -m "Initial commit. Added gems to Gemfile and project-specific gitignore"
+$ pry
 </code></p>
 
-<p>Create a new Github or Bitbucket Repository. Add it to your local repository as a remote and push it.</p>
-
-<p>Setup POW symlink to make application available on <code>.dev</code> using:
-<code>
-$ powder link
-</code></p>
-
-<h4 id="heroku-setup">Heroku Setup</h4>
-
-<p>Create Heroku app for <code>staging</code>:
-<code>
-$ heroku create example-name --remote staging --region eu
-$ git push staging master
-$ heroku run rake db:migrate --remote staging
-</code>
-Check remote is up and running:
-<code>
-$ heroku ps --remote staging
-$ heroku open --remote staging
-</code>
-<em>Repeat the above with <code>production</code>.</em></p>
-
-<p>Make sure staging runs the correct environment by setting environmental variables:
-<code>
-heroku config:set RACK_ENV=staging RAILS_ENV=staging --remote staging
-</code></p>
-
-<p>Add (free) database backups to production:
-<code>
-heroku addons:add pgbackups --remote production
-</code></p>
-
-<h4 id="database-setup">Database Setup</h4>
-
-<p>Open <code>config/database.yml</code> and change usernames from application name (default) to PostgreSQL username. Also delete production.</p>
-
-<p>```
-common: &amp;common
-  adapter: postgresql
-  encoding: unicode
-  username: pedr</p>
-
-<p>development:
-  «: *common
-  database: pathways-archive_development</p>
-
-<p>test:
-  «: *common
-  database: pathways-archive_test
-```</p>
-
-<h4 id="config">Config</h4>
-
-<p>Add the following to <code>/config/application.rb</code>:</p>
+<p>Add a semi-colon to a method call to redact the return value from the STDout:</p>
 
 <p><code>
-config.autoload_paths += %W(#{config.root}/lib)
-config.assets.initialize_on_precompile = false
+$ example;
 </code></p>
 
-<h4 id="dotenv">DotEnv</h4>
+<p>Tab completion comes out of the box.</p>
 
-<p>Load Environmental Vars immediately so they are available to Rails as it boots by adding the following to <code>/config/boot.rb</code></p>
+<p>Within Pry:</p>
 
-<p><code>
-# Load Environmental variables
-require 'dotenv'
-Dotenv.load
-</code></p>
+<p><code>$ reset</code> Reset the REPL to a clean state.
+<code>$ whereami</code> Show code surrounding the current context.
+<code>$ cd</code> Move into a new context (object or scope).
+<code>$ ls</code> Show the list of vars and methods in the current scope.</p>
 
-<p>Remove <code>public/index.html</code></p>
+<p>Pry can be configured using a <code>.pryrc</code> file in the user directory.</p>
+
+<p>The <a href="https://github.com/rweng/pry-rails">Pry Rails Gem</a> gets Pry working with the Rails console, so that <code>$ rails c</code> opens Pry instead of IRB.</p>
+
+<p>It adds a <code>show-routes</code> command that is equivalent to <code>$ rake routes</code></p>
 
                 </div>
                 <div class="secondary">
@@ -267,7 +172,27 @@ Dotenv.load
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -422,71 +347,71 @@ Dotenv.load
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -497,7 +422,7 @@ Dotenv.load
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -508,15 +433,15 @@ Dotenv.load
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -527,11 +452,11 @@ Dotenv.load
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

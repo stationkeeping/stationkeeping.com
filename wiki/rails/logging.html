@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Active Record Associations</title>
+        <title>Rails Logging</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,72 +31,32 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>Associations are exposed as methods, and behind the scenes an association is implemented as an <code>AssociationProxy</code>. The proxy delegates most instance methods to the actual association (a ruby object or Array). <code>AssociationProxy</code> is actually the base class for a class specific to the association, with a:</p>
+                    <p>Access the logger anywhere using <code>Rails.logger</code>.</p>
+
+<p>To create a logger:</p>
 
 <p><code>
-AssociationProxy
-   - BelongsToAssociation
-   - HasOneAssociation
-   - BelongsToPolymorphicAssociation
-   - AssociationCollection 
-      - HasAndBelongsToMany
-      - HasManyAssociation
-      - HasManyThroughAssociation
-      - HasOneThroughAssociation
+require 'logger'
+logger = Logger.new STDOUT
 </code></p>
 
-<h4 id="indexes">Indexes</h4>
-
-<p>Add indexes to any foreign key columns in a migration:</p>
+<p>Logs are saved to <code>logs</code> with a separate file per environment. To clear all logs:</p>
 
 <p><code>
-add_index :example, :foo_id
+$ rake log:clear
 </code></p>
 
-<h5 id="counter-cache">Counter Cache</h5>
-
-<p>Getting the number of items in a relationship is usually an expensive database operation, needing multiple hits:</p>
+<p>To tail the development log:</p>
 
 <p><code>
-owner.belongings.length
+$ tail -f log/development.log
 </code></p>
 
-<p>A counter cache tracks the number of items in a belongs_to relationship, ensuring the value is available on the owning instance. It is declared on the belonging member:</p>
+<p>Or using the <em>Powder</em> gem:</p>
 
 <p><code>
-belongs_to :foo, counter_cache: true
+$ powder applog
 </code></p>
-
-<p>And a column must be added to the owning member with a default value of 1:</p>
-
-<p><code>
-add_column :owners, :belongers_count, :integer, default: 0
-</code></p>
-
-<p>It is used on the owning menber:</p>
-
-<p><code>
-owner.belongings_count
-</code></p>
-
-<h5 id="using-associations-named-differently-to-the-class-they-refer-to">Using Associations Named Differently To The Class THey Refer To</h5>
-
-<p>Sometimes it may be necessary to name an association differently, for example, a relationship might be named <code>latest_foo</code>, but refer to <code>foo</code>. In this case, the <code>class_name</code> can be set:</p>
-
-<p><code>
-has_one :latest_foo, class_name: :foo
-</code></p>
-
-<p>It's OK to have both a <code>has_many</code> and a <code>has_one</code> to the same model, sharing a primary key:</p>
-
-<p><code>
-class Foo
-   has_many :bars
-   has_one :latest_bar
-end
-</code></p>
-
-<p>##### </p>
 
                 </div>
                 <div class="secondary">
@@ -204,7 +164,27 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -359,71 +339,71 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -434,7 +414,7 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -445,15 +425,15 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -464,11 +444,11 @@ end
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

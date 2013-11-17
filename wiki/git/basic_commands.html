@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Debugging Using Console</title>
+        <title>Basic Commands</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,49 +31,197 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>Open/close with <code>Alt / Cmd / I</code></p>
-
-<h5 id="console">Console</h5>
-
-<p>Use assertions in the source to check application state:</p>
-
-<p><code>
-console.assert(1 == 9); // Raises Exception
+                    <p>Create a new git repo (in pwd):
+<code>
+$ git init
 </code></p>
 
-<p>Inspect an object using <code>inspect</code>:</p>
-
-<p><code>
-$ inspect(exampleObject)
+<p>Show current staging status of all files in the repo:
+<code>
+$ git status
 </code></p>
 
-<p>Get a reference to the last selected element in the DOM using <code>$0</code> and previous items with <code>$1</code>, <code>$2</code>, <code>$3</code> etc.</p>
-
-<h5 id="breaking-on-exceptions">Breaking on Exceptions</h5>
-
-<p>Sources Tab &gt; Console</p>
-
-<p>Pause button has three modes:</p>
-
-<ul>
-  <li>[Blue] Break on any exception</li>
-  <li>[Purple] Break on uncaught exception</li>
-  <li>[Black] Don't break</li>
-</ul>
-
-<h5 id="opening-debugger-at-point-in-code">Opening Debugger At Point In Code</h5>
-
-<p>Add <code>debugger;</code> at the point in your code you want to debug. When the execution hits that line the application will break.</p>
-
-<h5 id="look-at-an-objects-structure-from-the-console">Look at an object's structure from the console</h5>
-
-<p>Some objects, like classes only show up as strings, but you can inspect the object properly using:</p>
-
-<p><code>
-$ dir(someClass)
+<p>Show commit history:
+<code>
+$ git log
 </code></p>
 
-<p>Shift-click refresh to reload the page, bypassing the cache.</p>
+<p>Show compact commit history with commit per line:
+<code>
+$ git log --oneline
+</code></p>
+
+<p>Stage a file for commit:
+<code>
+$ git add example.txt
+</code></p>
+
+<p>Stage all changed files for commit:
+<code>
+$ git add -A
+</code></p>
+
+<p>Remove a staged file (The opposite of <code>$ git add</code>)
+<code>
+$ git reset example.txt
+</code></p>
+
+<p>Remove a file called 'example.txt', deleting it from local filesystem:
+<code>
+$ git rm example.txt
+</code></p>
+
+<p>Remove a file called 'example.txt', leaving in local file system:
+<code>
+$ git rm --cached example.txt
+</code></p>
+
+<p>Show changes between files in working tree and previous commit
+<code>
+$ git diff
+</code></p>
+
+<p>Show changes between staged files and previous commit
+<code>
+$ git diff -staged
+</code></p>
+
+<p>Commit staged files:
+<code>
+$ git commit -m "Example commit message"
+</code></p>
+
+<p>Commit staged files, adding any changed files that are tracked, but unstaged.
+<code>
+$ git commit -a -m "Example commit message"
+</code></p>
+
+<p>Add a file to the previous commit:
+<code>
+$ git commit --amend -m "Example commit message"
+</code></p>
+
+<p>Undo commit, returning committed files to staging:
+<code>
+$ git reset --soft HEAD^
+</code></p>
+
+<p>Undo commit, discarding all changes:
+<code>
+$ git reset --hard HEAD^
+</code></p>
+
+<p>Discard changes to file called 'example.html':
+<code>
+$ git checkout -- example.html
+</code></p>
+
+<p>Add a remote repo as origin:
+<code>
+$ git remote add origin git@example.com:example/example.git
+</code></p>
+
+<p>Push <code>master</code> branch to remote called <code>origin</code>, defaulting to origin in future:
+<code>
+$ git push -u origin master
+</code></p>
+
+<p>Clone a pre-existing repository to a folder named after the respository:
+<code>
+$ git clone git@example.com:example/example.git
+</code></p>
+
+<p>Clone a pre-existing repository to a folder named <code>example</code>:
+<code>
+$ git clone git@example.com:example/example.git example
+</code></p>
+
+<p>List remotes:
+<code>
+$ git remote -v
+</code></p>
+
+<p>Display the current branch:
+<code>
+$ git branch
+</code></p>
+
+<p>Create a brach:
+<code>
+$ git branch example
+</code></p>
+
+<p>Checkout the branch 'example':
+<code>
+$ git checkout example
+</code></p>
+
+<p>Create and checkout a branch called example:
+<code>
+$ git checkout -b example
+</code></p>
+
+<p>Merge a branch called 'example' with the 'master' branch:
+<code>
+$ git checkout master
+$ git merge example
+</code></p>
+
+<p>Delete a branch called 'example':
+<code>
+$ git branch -d example
+</code></p>
+
+<p>Push local branch called 'example' to origin:
+<code>
+$ git push origin example
+</code></p>
+
+<p>Show all remote branches:
+<code>
+$ git branch -r
+</code></p>
+
+<p>Delete a remote branch called 'example':
+<code>
+$ git push origin :example
+</code></p>
+
+<p>Show remote branch status (which are being tracked and which are stale):
+<code>
+$ git remote show origin
+</code></p>
+
+<p>Clean up remote branches:
+<code>
+$ git remote prune origin
+</code></p>
+
+<p>Show tags:
+<code>
+$ git tag
+</code></p>
+
+<p>Create a tag called 'v1.0.0':
+<code>
+$ git tag -a 'v1.0.0' -m 'Version 1.0.0'
+</code></p>
+
+<p>Push tags to origin:
+<code>
+$ git push --tags
+</code></p>
+
+<p>Switch to a tag called '1.0.0':
+<code>
+$ git checkout '1.0.0'
+</code></p>
+
+<p>Change remote url:</p>
+
+<p><code>
+git remote set-url staging git@heroku.com:example.git
+</code></p>
 
                 </div>
                 <div class="secondary">

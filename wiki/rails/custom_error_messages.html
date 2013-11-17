@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Git Tips</title>
+        <title>Rails Custom Error Messages</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,34 +31,54 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <h2 id="multiple-github-account-authentication-using-ssh">Multiple github account authentication using SSH</h2>
+                    <p>Tell rails that you want to handle errors with Routes:</p>
 
-<p>To manage multiple <a href="http://www.github.com">github</a> accounts using multiple <a href="http://en.wikipedia.org/wiki/Secure_Shell">ssh</a> keys:</p>
+<p><code>
+config.exceptions_app = self.routes
+</code></p>
 
-<ul>
-  <li>Create a config file in your home .ssh directory <code>vim ~/.ssh/config</code></li>
-  <li>
-    <p>Use the following as an example for two accounts:</p>
+<p>To actually see the errors in development:</p>
 
-    <pre><code>  Host github_repos1
-      HostName github.com
-      User git
-      IdentityFile "/Users/stationkeeping/.ssh/id_rsa1"
-      TCPKeepAlive yes
-      IdentitiesOnly yes
+<p><code>
+config.consider_all_requests_local = false
+</code></p>
 
-  Host github_repos2
-      HostName github.com
-      User git
-      IdentityFile "/Users/stationkeeping/.ssh/id_rsa2"
-      TCPKeepAlive yes
-      IdentitiesOnly yes
-</code></pre>
-  </li>
-  <li>Add your rsa identities to the authentication agent: <code>ssh-add ~/.ssh/id_rsa1</code> etc.</li>
-  <li>When adding your remote to the local repos ensure you use the <strong>Host</strong> name in replacement for git@github.com e.g. <code>git remote add origin github_repos1:stationkeeping/repos1.git</code>.</li>
-  <li>Check the git remotes: <code>git remote -v</code></li>
-</ul>
+<p>Delete static error pages from <code>public</code>.</p>
+
+<p>Add to routes (above any catch-all matchers like High Voltage's <code>page#show</code>):</p>
+
+<p><code>
+# Exceptions
+match '/404' =&gt; 'exceptions#error_404'
+match '/422' =&gt; 'exceptions#error_422'
+match '/500' =&gt; 'exceptions#error_500'
+</code></p>
+
+<p>Create the exceptions controller:</p>
+
+<p>```
+class ExceptionsController &lt; ApplicationController</p>
+
+<p>layout "application"</p>
+
+<p>respond_with :html</p>
+
+<p>def error_404
+    render status: :not_found
+  end</p>
+
+<p>def error_422
+    render status: :unprocessable_entity
+  end</p>
+
+<p>def error_500
+    render status: :internal_server_error
+  end</p>
+
+<p>end
+```</p>
+
+<p>Create views for each exception.</p>
 
                 </div>
                 <div class="secondary">
@@ -166,7 +186,27 @@
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -321,71 +361,71 @@
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -396,7 +436,7 @@
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -407,15 +447,15 @@
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -426,11 +466,11 @@
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

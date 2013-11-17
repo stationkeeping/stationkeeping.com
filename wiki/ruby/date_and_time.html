@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Controllers</title>
+        <title>Ruby Date And Time</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,174 +31,22 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>Much of <code>ActionController</code> is implemented in Rack, as a series of filters. Other gems like <em>Warden</em> and <em>BetterErrors</em> are also written as Rack filters. Sometimes these filters are a way of tying gem functionality into Rack rather than the functionality existing entirely within Rack.</p>
-
-<p>Show Rack Filters used by an application:</p>
+                    <h4 id="take-a-commonly-formatted-date---29-march-20012---and-convert-it-to-a-datetime-for-storing-in-a-db">Take a commonly-formatted date - 29 March 20012 - and convert it to a DateTime (for storing in a DB)</h4>
 
 <p><code>
-$ rake middleware
+date = "29 March 2013"
+date_components = date.split(' ').reverse
+DateTime.new(Integer(date_components[0]), Date::MONTHNAMES.index(date_components[1]), Integer(date_components[2]))
+=&gt; Fri, 29 Mar 2013 00:00:00 +0000
 </code></p>
 
-<h4 id="request-flow">Request Flow</h4>
-
-<h5 id="dispatching">Dispatching</h5>
-
-<p>The <code>routes.rb</code> file generates a <code>ActionDispatch::Routing::RouteSet</code> via the call to <code>Example::Application.routes.draw do</code>. The RouteSet is used to find a matching route and determine its <em>Rack Endpoint</em>. If the endpoint is a controller action, the associated dispatcher then invokes this action. All Controller actions are <em>Rack Endpoints</em>, but the endpoint could also be another Rack app, a redirect macro, or a lambda.</p>
-
-<p>To manually invoke a dispatcher:</p>
+<h4 id="take-a-datetime-and-display-as-sat-feb-3rd-2013">Take a DateTime and display as "Sat Feb 3rd, 2013"</h4>
 
 <p><code>
-&gt;&gt; env = {}
-&gt;&gt; env['REQUEST_METHOD'] = 'GET'
-&gt;&gt; env['PATH_INFO'] = '/example/index'
-&gt;&gt; env['rack.input'] = StringIO.new
-ActionController::Dispatcher.new.call(env).last.body # For the response body
+date_time = DateTime.now()
+date_time.strftime("%a %B #{d.day.ordinalize}, %Y")
+=&gt; "Tue March 3rd, 2013"
 </code></p>
-
-<p>A controller's implementation of an action allows for custom handling, however, if no implementation for the action exists or the implementation is empty, it is assumed a view exists, so Rails looks for the view to render. If an action is missing, empty or no rendering is specified, Rails will do the equivalent of:</p>
-
-<p><code>
-render "example/index"
-</code></p>
-
-<h5 id="rendering">Rendering</h5>
-
-<p>Rendering is the last piece of the request flow.</p>
-
-<p>A controller action can render the template for a different action (for example an <code>update</code> action can render an <code>edit</code> action template if a form fails to validate):</p>
-
-<p><code>
-def update
- render action: :update
-end
-</code></p>
-
-<p>This will render the <code>update</code> template, but will not call the <code>update</code> action, so whatever the template needs must be made available to it.</p>
-
-<p>To render an explicit template:</p>
-
-<p><code>
-render template: '/example/update.html.erb'
-</code></p>
-
-<p>To render JSON (assuming whatever is passed has a <code>to_json</code> method):</p>
-
-<p><code>
-render json: @example
-</code></p>
-
-<p>or with a JSONP callback:</p>
-
-<p><code>
-render json: @example, callback: "example_callback"
-</code></p>
-
-<p>To render nothing:</p>
-
-<p><code>
-render :nothing =&gt; true, :status =&gt; 401
-</code></p>
-
-<h6 id="other-options">Other options</h6>
-
-<p>Mime type: <code>:content—type</code>
-Layout: <code>:layout</code>
-Status: <code>:status</code></p>
-
-<h5 id="redirecting">Redirecting</h5>
-
-<p>Redirecting breaks the flow of the current request flow and initiates another one.</p>
-
-<p>Redirect using controller action:</p>
-
-<p><code>
-redirect_to action: show, id: 4
-</code></p>
-
-<p>Or using a model (in which case <code>url_for</code> is called on it)</p>
-
-<p><code>
-redirect_to @example
-</code></p>
-
-<p>Or a URL (hardcoded or in the form of a URL helper).</p>
-
-<p>Or <code>:back</code> which will return to the page that issued the request (the request's <code>HTTP_REFERER</code>) :</p>
-
-<p><code>
-redirect_to :back
-</code></p>
-
-<p>A flash message can also be passed (using <code>status:</code>, <code>alert:</code> or a hash value for <code>flash:</code>:</p>
-
-<p><code>
-redirect_to example_url(@example), alert: "Nope"
-</code></p>
-
-<p>An action will continue executing after a redirect, and will end up rendering a view, causing a <code>DoubleRenderError</code> </p>
-
-<h4 id="filters">Filters</h4>
-
-<p>Filters are declared at the top of a controller, and are run in the order they are declared. They can be declared together:</p>
-
-<p><code>
-before_filter :foo, :bar
-</code></p>
-
-<p>Or separately:</p>
-
-<p>```
-before_filter :foo
-before_filter :bar</p>
-
-<p>```</p>
-
-<p>A filter is usually a method, but could also be a class which is scoped to the controller with full access to its methods:</p>
-
-<p>```
-class ExampleFilter
-  def self.after(controller)
-    # Do something
-  end
-end</p>
-
-<p>class ExampleController &lt; ActionController::Base
-  after_filter ExampleFilter
-end
-```</p>
-
-<p>A filter can also take the form of a block, executed in the context of the controller:</p>
-
-<p><code>
-before_filter do
-   # Do something
-end
-</code></p>
-
-<p>Filters can also be prepended using: <code>prepend_before_filter</code> and <code>prepend_after_filter</code>, or wrapped around an action using <code>around_filter</code>.</p>
-
-<p>To skip a filter defined on a superclass:</p>
-
-<p><code>
-skip_before_filter :example_filter
-</code></p>
-
-<p>Filters can be made action-specific using:</p>
-
-<p><code>
-before_filter :example_filter, :only =&gt; [:edit, :delete]
-</code></p>
-
-<p>Calling <code>render</code> or <code>redirect_to</code> from a filter will halt execution of all other filters.</p>
-
-<h5 id="send-data">Send Data</h5>
-
-<p>Textual or binary data can be sent to the client in a buffer and set either to be downloaded or to be displayed inline using <code>send_data</code>.</p>
-
-<h5 id="send-file">Send File</h5>
-
-<p><code>send_file</code> is similar to <code>send_data</code>, but rather than using data, it references a pre-existing file and hands off the writing of the file to the server, rather than Rails taking care of it itself. </p>
-
 
                 </div>
                 <div class="secondary">
@@ -306,7 +154,27 @@ before_filter :example_filter, :only =&gt; [:edit, :delete]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -461,71 +329,71 @@ before_filter :example_filter, :only =&gt; [:edit, :delete]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -536,7 +404,7 @@ before_filter :example_filter, :only =&gt; [:edit, :delete]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -547,15 +415,15 @@ before_filter :example_filter, :only =&gt; [:edit, :delete]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -566,11 +434,11 @@ before_filter :example_filter, :only =&gt; [:edit, :delete]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Prelaunch Check</title>
+        <title>Rails Routing</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,23 +31,189 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <h4 id="sensitive-parameters">Sensitive Parameters</h4>
+                    <ol>
+  <li>Map URL to Controller</li>
+  <li>Genrate URLS (via URL helpers)</li>
+</ol>
 
-<p>Check that any sensitive params are filtered out of the logs. By default in <code>config/application.rb</code>:</p>
+<p>When matching a route, the rooter starts from the top of <code>routes.rb</code> and works its way down, checking each route for a match until it finds one. If it reaches the end without finding a match, it raises an exception.</p>
+
+<p>Basic match (all HTTP verbs):</p>
 
 <p><code>
-config.filter_parameters += [:password]
+match "example/foo" =&gt; "example#foo"
 </code></p>
 
-<p>Add any others e.g.</p>
+<p>Match a particular HTTP verb:</p>
 
 <p><code>
-config.filter_parameters += [:password_confirmation]
+get "example/foo" =&gt; "example#foo"
+post "example/foo" =&gt; "example#foo"
 </code></p>
 
-<h4 id="database-indexes">Database Indexes</h4>
+<p>Or for multiple HTTP verbs on the same route:</p>
 
-<p>Check that all foreign key database columns have an index. Note that sometimes these are added implicitly.</p>
+<p><code>
+match "example/foo" =&gt; "example#foo", [via: :get]
+</code></p>
+
+<p>Adding a segment key is like setting the segment as a variable: <code>:example</code> means that the value of this segment of the url will be set as a parameter, with a key being the segment key:</p>
+
+<p><code>
+get "example/foo/:example" # url of example/foo/66 would generate a parameter of params[:example] = 66
+</code></p>
+
+<h5 id="redirects">Redirects</h5>
+
+<p>You can redirect a path directly using:</p>
+
+<p><code>
+match "/foo", :to =&gt; redirect("/bar")
+</code></p>
+
+<p>Or using a block (with optional status):</p>
+
+<p><code>
+match "/foo/:id", :to =&gt;
+  redirect(status: 302) {|params| "/bar/#{params[:id]}" }
+</code></p>
+
+<h5 id="constraints">Constraints</h5>
+
+<p>Using constraints allows a segment key, anything in the params hash, or a number of other values like <code>subdomain</code> and <code>referrer</code> to be validated before a route matches. By using a second unconstrained route, any routes that failed to validate can be handled:</p>
+
+<p><code>
+match ':controller/show/:id' =&gt; :show, :constraints =&gt; {:id =&gt; /\d+/} #Check id is numerical
+match ':controller/show/:id' =&gt; :show_error
+</code></p>
+
+<p>Or constraining multiple routes:</p>
+
+<p><code>
+constraints :subdomain =&gt; '' do
+   …
+end
+</code></p>
+
+<p>To access the <code>request</code> object in constraints:</p>
+
+<p><code>
+match 'example/:id' =&gt; "example#show",
+  :constraints =&gt; proc {|request| request.params[:id].to_i &lt; 100 }
+</code></p>
+
+<h5 id="root-route">Root Route</h5>
+
+<p>The root of your domain is routed using:</p>
+
+<p><code>
+root :to =&gt; "pages#show"
+</code></p>
+
+<h5 id="root-globbing">Root Globbing</h5>
+
+<p>To expose an arbitrary number of segments to a controller as variables, effectively saying that 'after this point in the url, pass everything else in as a variable':</p>
+
+<p><code>
+get "example/foo/*remaining =&gt; example#show
+</code></p>
+
+<p>So anything in the url after <code>foo</code> will be added to the <code>params</code> hash as :remaining:</p>
+
+<p><code>
+example/foo/some/thing # params[:remaining] = "some/thing"
+example/foo/some/thing/else/longer # params[:remaining] = "some/thing/else/longer"
+</code></p>
+
+<h5 id="named-routes">Named Routes</h5>
+
+<p>Routes can be exposed via URL helpers using <code>as</code>. To generate a helper <code>bar_path</code>:</p>
+
+<p><code>
+get "example/foo" =&gt; example, as: 'bar'
+</code></p>
+
+<p>To pass variables into a URL helper:</p>
+
+<p><code>
+example_path(id: example_model.id)
+</code></p>
+
+<p>Or if it's a numerical id:</p>
+
+<p><code>
+example_path(example_model.id)
+</code></p>
+
+<p>Or use the object itself:</p>
+
+<p><code>
+example_path(example_model)
+</code></p>
+
+<h5 id="displaying-text-instead-of-id">Displaying text instead of id</h5>
+
+<p>Rails calls <code>to_param</code> to get the variable value to insert into the URL. By default it returns the model's <code>id</code>, but by overriding <code>to_param</code> anything can be returned, for example, the model name. Anything returned should be suitable for use in a URL:</p>
+
+<p><code>
+def to_param
+  name.parameterize
+end
+</code></p>
+
+<p>The flip side of using a slug rather than an id is that when a controller finds the model using the URL segment, it needs to do so using the appropriate attribute, for example:</p>
+
+<p><code>
+Example.find_by_parametised_name(params[:slug])
+</code></p>
+
+<h4 id="resources">Resources</h4>
+
+<p>Restful routes can be auto-generated in <code>routes.config</code> by using:</p>
+
+<p><code>
+resources :example
+</code></p>
+
+<p>Or for singular resources (which gives all routes other than <code>index</code>:</p>
+
+<p><code>
+resource :example
+</code></p>
+
+<p>Additional routes can be added using:</p>
+
+<p><code>
+resources :example do
+  get :foo, on: :member
+  get :bar, on: :collection
+end
+</code></p>
+
+<p>Or for multiple HTTP verbs for the same route:</p>
+
+<p><code>
+resources :example do
+  match :foo, via: [:get, :post], on: :member
+  match :bar, via: [:get, :post], on: :collection
+end
+</code></p>
+
+<p>To map custom names to the standard actions:</p>
+
+<p><code>
+resources :example, :path_names =&gt; { :new =&gt; 'foo', :edit =&gt; 'bar'}
+</code></p>
+
+<h5 id="nested-routes">Nested Routes</h5>
+
+<p>Resources can be nested using: </p>
+
+<p><code>
+resources :foo do
+  resources :bar
+end
+</code></p>
 
 
                 </div>
@@ -156,7 +322,27 @@ config.filter_parameters += [:password_confirmation]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -311,71 +497,71 @@ config.filter_parameters += [:password_confirmation]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -386,7 +572,7 @@ config.filter_parameters += [:password_confirmation]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -397,15 +583,15 @@ config.filter_parameters += [:password_confirmation]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -416,11 +602,11 @@ config.filter_parameters += [:password_confirmation]
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

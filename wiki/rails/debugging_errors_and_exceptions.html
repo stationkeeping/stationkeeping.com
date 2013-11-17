@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Ruby Gems Basics</title>
+        <title>Rails Debugging Errors And Exceptions</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,75 +31,43 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>By default gems are installed into <code>~.bundle</code>. You can tell bundler to use a project directory instead using:</p>
+                    <p><strong>Don't use minified vendor CSS/JS files. They are often missing important debug messages and using a debugger is unpleasant. When you precompile your assets <em>they will all be minifed anyway</em>.</strong></p>
+
+<h4 id="better-errors">Better Errors</h4>
+<p>Better Errors gives much more useful error pages, allowing you to drill down through the stack, jumping to the source file and embeds a console so you can investigate the application live.</p>
+
+<p>Use <code>better_errors</code> and <code>binding_of_caller</code> gems:</p>
 
 <p><code>
-$ bundle install vendor
+gem 'better_errors'
+gem 'binding_of_caller'
 </code></p>
 
-<p>This will sue symlinks to a single location. To install actual gems locally:</p>
+<p>To see the last exception: <code>{base_url}__better_errors</code></p>
+
+<p>To customise the editor that is opened from Better Errors, add a <code>better_errors.rb</code> initialiser:</p>
 
 <p><code>
-bundle install vendor --disable-shared-gems
+BetterErrors.editor = :sublime if defined? BetterErrors
 </code></p>
 
-<p>In this case bundler  iterm  </p>
+<h4 id="rails-panel">Rails Panel</h4>
+<p>Rails Panel adds a new tab to Chrome Developer Tools called <em>Rails</em>, that displays both HTML and JavaScript requests within your Rails app.</p>
 
-<p>If a gem name is different from the name needed in a require statement, for example the gem is called <code>sqlite3-ruby</code> and the name is <code>sqlite</code>, the gem will not be auto-required, and you would need to add <code>require  sqlite</code> to use it. </p>
-
-<p>To map the gem name to the correct name so it is auto-required, use:</p>
+<p>You need to add the <em>Meta Request</em> gem to your Gemfile:</p>
 
 <p><code>
-gem "sqlite-rails", require: "sqlite"
+gem 'meta_request'
 </code></p>
 
-<p>For using a gem from a Git repo:</p>
+<p>And install the Chrome Extension.</p>
+
+<p>To set Sublime Text as the editor linked to the Plugin, choose Sublime from: <code>Chrome &gt; Prefs &gt; Extensions &gt; Rails Panel</code> and install <code>[SublimeText 2 URLHandler](https://github.com/asuth/subl-handler)' which enables support for </code>subl://` URLs.</p>
+
+<p>Check Speed of gem load (loads and runs gist found <a href="https://gist.github.com/panthomakos/2588879">here</a>:</p>
 
 <p><code>
-gem 'paperclip', :git =&gt; 'git://github.com/thoughtbot/paperclip.git'
-</code></p>
-
-<p>For using a local gem:</p>
-
-<p><code>
-gem 'example', :path =&gt; '~/code/example'
-</code></p>
-
-<p>For using a local gem locally only, and a git repo remotely:</p>
-
-<p><code>
-$ bundle config.example "Path/to/local/git/repo/of/example
-</code></p>
-
-<p>Then add the gem to the <code>Gemfile</code> as a git repo instead of a Rubygem. The <code>github</code> argument can be blank:</p>
-
-<p><code>
-gem "example",  github: "", branch: "master"
-</code></p>
-
-<p>To install gems without installing gems from particular groups, for example on production:
-<code>
-$ bundle install --without development test
-</code></p>
-
-<p>To package gems to <code>vendor/cache</code> to avoid install from external sources:</p>
-
-<p><code>
-$ bundle package
-</code></p>
-
-<p>This could be used to deploy gems from a local repo to a remote location that doesn't have access to the local repo.</p>
-
-<p>Rbenv installs gems to: </p>
-
-<p><code>
-{USER_HOME}/.rbenv/versions/{RUBY_VERSION}/lib/ruby/gems/{COMPATABILITY_LEVEL}/gems/{GEM_NAME}-{GEM_VERSION}
-</code></p>
-
-<p>For example:</p>
-
-<p><code>
-/Users/me/.rbenv/versions/1.9.3-p392/lib/ruby/gems/1.9.1/gems/example-1.15.0
+bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.rb)" | sort -n -k4
 </code></p>
 
                 </div>
@@ -208,7 +176,27 @@ $ bundle package
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -363,71 +351,71 @@ $ bundle package
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -438,7 +426,7 @@ $ bundle package
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -449,15 +437,15 @@ $ bundle package
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -468,11 +456,11 @@ $ bundle package
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

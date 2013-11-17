@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Rails Debugging Errors And Exceptions</title>
+        <title>Configuration</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,43 +31,44 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p><strong>Don't use minified vendor CSS/JS files. They are often missing important debug messages and using a debugger is unpleasant. When you precompile your assets <em>they will all be minifed anyway</em>.</strong></p>
-
-<h4 id="better-errors">Better Errors</h4>
-<p>Better Errors gives much more useful error pages, allowing you to drill down through the stack, jumping to the source file and embeds a console so you can investigate the application live.</p>
-
-<p>Use <code>better_errors</code> and <code>binding_of_caller</code> gems:</p>
-
-<p><code>
-gem 'better_errors'
-gem 'binding_of_caller'
+                    <p>Show all configuration settings:
+<code>
+git config --list
 </code></p>
 
-<p>To see the last exception: <code>{base_url}__better_errors</code></p>
-
-<p>To customise the editor that is opened from Better Errors, add a <code>better_errors.rb</code> initialiser:</p>
-
-<p><code>
-BetterErrors.editor = :sublime if defined? BetterErrors
+<p>Open Git's config file in your editor::
+<code>
+git config --global --edit
 </code></p>
 
-<h4 id="rails-panel">Rails Panel</h4>
-<p>Rails Panel adds a new tab to Chrome Developer Tools called <em>Rails</em>, that displays both HTML and JavaScript requests within your Rails app.</p>
-
-<p>You need to add the <em>Meta Request</em> gem to your Gemfile:</p>
-
-<p><code>
-gem 'meta_request'
+<p>Setup Username and email:
+<code>
+$ git config --global user.name 'Example Name'
+$ git config --global user.email 'example@example.com'
 </code></p>
 
-<p>And install the Chrome Extension.</p>
+<p>Tell Git to use colours:
+<code>
+$ git config --global color.ui true
+</code></p>
 
-<p>To set Sublime Text as the editor linked to the Plugin, choose Sublime from: <code>Chrome &gt; Prefs &gt; Extensions &gt; Rails Panel</code> and install <code>[SublimeText 2 URLHandler](https://github.com/asuth/subl-handler)' which enables support for </code>subl://` URLs.</p>
+<p>Get the current branch (and pwd) in the command prompt by adding this to <code>~/.bash_profile</code>:
+```
+parse_git_branch() {
+    git branch 2&gt; /dev/null | sed -e '/^[^<em>]/d' -e 's/</em> (.*)/(\1)/'
+}</p>
 
-<p>Check Speed of gem load (loads and runs gist found <a href="https://gist.github.com/panthomakos/2588879">here</a>:</p>
+<p>export PS1="[\033[00m]\u@\h[\033[01;34m] \W [\033[31m]$(parse_git_branch) [\033[00m]$[\033[00m] "
+```</p>
 
-<p><code>
-bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.rb)" | sort -n -k4
+<p>Setup a global <code>.gitignore</code>:
+<code>
+git config --global core.excludesfile '/Users/pedr/.gitignore_global'
+</code></p>
+
+<p>Use Sublime Text as the default editor (Assuming it has been set in your <code>bash_profile</code> using <code>export EDITOR='subl -w'</code>:
+<code>
+git config --global core.editor 'subl -w'
 </code></p>
 
                 </div>
@@ -176,7 +177,27 @@ bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -331,71 +352,71 @@ bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -406,7 +427,7 @@ bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -417,15 +438,15 @@ bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -436,11 +457,11 @@ bundle exec ruby -e "$(curl -fsSL https://gist.github.com/raw/2588879/benchmark.
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>

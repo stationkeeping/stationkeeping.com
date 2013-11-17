@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Ruby Metaprogramming</title>
+        <title>Rails Settings And Startup</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -31,45 +31,107 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p>There are no such things as class methods in Ruby. Classes are objects and every method is a method on an object. </p>
+                    <p>When running a Rails app (via <code>runner</code>, <code>console</code>, <code>server</code>)</p>
 
-<h4 id="eigenclass">Eigenclass</h4>
+<ol>
+  <li>boot.rb sets up Bundler and load paths</li>
+  <li>application.rb loads rails gems, gems for the specified Rail.env, and configures the application</li>
+  <li>environment.rb runs all initializers</li>
+</ol>
 
-<p>A method can be defined on a single object (instance):</p>
+<h4 id="applicationrb">Application.rb</h4>
 
-<p>```
-class Test
-end </p>
+<p>Is required by <code>environment.rb</code> and configures the application.</p>
 
-<p>a = Test.new
-b = Test.new</p>
+<p>It loads all the rails components using <code>require 'rails/all</code>, but this can be replaced with individual components as desired.</p>
 
-<p>def a.method_unique_to_this_instance
-   puts 'Unique'
-end</p>
+<p>Anything it sets can be overridden in environment-specific files. </p>
 
-<p>a.unique # Unique
-b.unique # NoMethodError</p>
+<p>Add non-default groups for use in <code>Gemfile</code>:</p>
 
-<p>```</p>
+<p><code>
+if defined?(Bundler)
+  # For custom groups, define which environments they should be included in
+  groups = {
+    assets: %w(development test),
+  }
+  Bundler.require(:security, :model, :view, *Rails.groups(groups))
+end
+</code></p>
 
-<p>In this situation, an anonymous <em>Eigenclass</em> is created to house the singleton method and inserted as the class of <code>a</code>, with its superclass pointing at its original class. This class is also hidden from us. Calling <code>a.class</code> returns its original superclass.</p>
+<p>Add other non-standard folders to Rails's class path:</p>
 
-<p>This means that methods added to a <em>class</em> are also done so using anonymous classes because they are added to the shared class object using <code>self</code>:</p>
+<p><code>
+config.autoload_paths += %W(#{config.root}/app/models/forms)
+</code></p>
 
-<p>```
-class Test</p>
+<p>Set timezone:</p>
 
-<p>def self.some_class_method
-   end</p>
+<p><code>
+config.time_zone = "London"
+</code></p>
 
-<p>def Test.some_other_class_method
-   end</p>
+<p>Add folders or files for precompilation if they aren't referenced in <code>application.css</code> or <code>application.js</code>.</p>
 
-<p>end
-```</p>
+<p><code>
+config.assets.precompile += "precompile/*.js"
+</code></p>
 
-<p>In both these situations, an Eigenclass is created housing these methods and set to <code>Test</code>'s parent class.</p>
+<p>You can also set up ActiveRecord Observers, Generators and Localisation.</p>
+
+<h5 id="other-settings">Other settings</h5>
+
+<h6 id="autoload">Autoload</h6>
+
+<p>By default, Rails performs <em>automatic class reloading</em>, meaning it reloads classes for every request, picking up any changes made. It does this by using <code>load</code> instead of <code>require</code> (which would only load a class the first time it is encountered).</p>
+
+<p>To see the load path:</p>
+
+<p><code>
+$LOAD_PATH
+</code></p>
+
+<p><code>lib</code> is not added to the autoload path, though it is added to the <code>$LOAD_PATH</code>. Files in <code>lib</code> need to be referenced using <code>require</code>. Or can be added to the autoload path using:</p>
+
+<p><code>
+config.autoload_paths += %W(#{config.root}/lib/*)
+</code></p>
+
+<p>This autoloading functionality is configured using:</p>
+
+<p><code>
+config.cache_classes = false
+</code></p>
+
+<h6 id="errors">Errors</h6>
+
+<p>Rails supplies useful error messages in local development. To display these messages on a remote machine:</p>
+
+<p><code>
+config.consider_all_requests_local = true
+</code></p>
+
+<h6 id="caching">Caching</h6>
+
+<p>By default, caching is turned off:</p>
+
+<p><code>
+config.action_controller.perform_caching = false
+</code></p>
+
+<h6 id="mail">Mail</h6>
+
+<p>Prevent mailer from raising an error if it can't send, for example if the development environment is not able to send mail:</p>
+
+<p><code>
+config.action_mailer.raise_delivery_errors = false
+</code></p>
+
+<p>Or prevent it even trying (mails are still logged)</p>
+
+<p><code>
+config.action_mailer.perform_deliveries = false
+</code></p>
 
                 </div>
                 <div class="secondary">
@@ -177,7 +239,27 @@ class Test</p>
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/git/git_tips.html">Git Tips</a>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
           </li>
         
       </ul>
@@ -332,71 +414,71 @@ class Test</p>
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rails/rails_active_record.html">Rails Active Record</a>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_active_record_associations.html">Rails Active Record Associations</a>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_background_tasks.html">Rails Background Tasks</a>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_console.html">Rails Console</a>
+            <a href="/wiki/rails/console.html">Rails Console</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_controllers.html">Rails Controllers</a>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_custom_error_messages.html">Rails Custom Error Messages</a>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_form_objects.html">Rails Form Objects</a>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_logging.html">Rails Logging</a>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_migrations.html">Rails Migrations</a>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_naming_models.html">Rails Naming Models</a>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_polymorphic_associations.html">Rails Polymorphic Associations</a>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_prelaunch_check.html">Rails Prelaunch Check</a>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_project_setup.html">Rails Project Setup</a>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_routing.html">Rails Routing</a>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_settings_and_startup.html">Rails Settings And Startup</a>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
           </li>
         
           <li>
-            <a href="/wiki/rails/rails_using_pry.html">Rails Using Pry</a>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
           </li>
         
       </ul>
@@ -407,7 +489,7 @@ class Test</p>
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/rake/rake_basics.html">Rake Basics</a>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
           </li>
         
       </ul>
@@ -418,15 +500,15 @@ class Test</p>
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby/ruby_date_and_time.html">Ruby Date And Time</a>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_metaprogramming.html">Ruby Metaprogramming</a>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby/ruby_misc.html">Ruby Misc</a>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
           </li>
         
       </ul>
@@ -437,11 +519,11 @@ class Test</p>
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
           </li>
         
           <li>
-            <a href="/wiki/ruby_gems/ruby_gems_basics.html">Ruby Gems Basics</a>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
           </li>
         
       </ul>
