@@ -1,6 +1,6 @@
-.page-title
+.page-tile
 {
-
+  font-size: 30px;
 }
 
 .section-title
@@ -9,12 +9,11 @@
 
   .secondary &
   {
-
-    margin-top: 10px;
     color: white;
-    padding: 6px 10px;
+    padding: 4px 9px 6px 9px;
     background: black;
     font-size: 16px;
+    letter-spacing: 2px;
     display: block;
     @include border-radius(4px);
   }
@@ -24,3 +23,4 @@
 {
 
 }
+
