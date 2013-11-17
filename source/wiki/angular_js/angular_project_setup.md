@@ -2,7 +2,7 @@
 title: "Angular Project Setup"
 ---
 
-New project setup
+Angular Project Setup
 ======================
 
 ### Client
@@ -28,14 +28,14 @@ New project setup
         before_filter :set_cors_headers
         before_filter :cors_preflight
         respond_to :json
-    
+
         def set_cors_headers
           headers['Access-Control-Allow-Origin'] = AppConfig.config[:client]['origin']
           headers['Access-Control-Allow-Methods'] = 'GET'
           headers['Access-Control-Allow-Headers'] = '*'
           headers['Access-Control-Max-Age'] = "3628800"
         end
-    
+
         def cors_preflight
           head(:ok) if request.method == :options
         end
@@ -61,7 +61,7 @@ To generate classes simply use Yeoman's angular [generators](https://github.com/
 
       create app/scripts/directives/placeholder.js
       create test/spec/directives/placeholder.js
-      
+
 ### Modules
 
 Individual file has it's own *module* and are named with their type then name  e.g. `directives.player`.
