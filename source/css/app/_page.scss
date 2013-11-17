@@ -4,8 +4,15 @@
   margin: 0 auto;
 }
 
+.page-header
+{
+  float: left;
+  padding:40px 0;
+}
+
 .page-body
 {
+  clear: both;
   width: 100%;
 }
 

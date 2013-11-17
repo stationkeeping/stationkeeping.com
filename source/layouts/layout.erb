@@ -24,8 +24,10 @@
         <![endif]-->
         <div class="page-container">
             <header class="page-header" >
-                <h1><%= link_to "Stationkeeping", "/" %></h1>
-
+                <div class="brand">
+                    <object class="logo" type="image/svg+xml" data="<%= image_path('img/logo.svg') %>">Your browser does not support SVG</object>
+                    <h1 class="name"><%= link_to "Stationkeeping", "/" %></h1>
+                </div>
             </header>
             <div class="page-body">
                 <div class="primary">
