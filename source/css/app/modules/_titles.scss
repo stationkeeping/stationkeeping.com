@@ -5,7 +5,18 @@
 
 .section-title
 {
+  margin-top: 0;
 
+  .secondary &
+  {
+    margin-top: 10px;
+    color: white;
+    padding: 6px 10px;
+    background: black;
+    font-size: 16px;
+    display: block;
+    @include border-radius(4px);
+  }
 }
 
 .subsection-title

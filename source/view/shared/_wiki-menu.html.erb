@@ -1,7 +1,7 @@
 <ul class="wiki-menu">
   <% sitemap.find_resource_by_destination_path("wiki/index.html").children.each do |wiki_folder| %>
     <li class="wiki-category">
-      <h2><%= wiki_folder.data.title %></h2>
+      <h2 class="section-title"><%= wiki_folder.data.title %></h2>
       <ul class="wiki-category-menu">
         <% wiki_folder.children.each do |wiki_page| %>
           <li>

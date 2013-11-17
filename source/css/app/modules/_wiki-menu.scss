@@ -1,4 +1,5 @@
-ul
+.wiki-menu,
+.wiki-category-menu
 {
   float:left;
   list-style: none;
@@ -9,5 +10,16 @@ ul
   {
     float:left;
     clear:both;
+    width:100%;
+
+  }
+}
+
+
+.wiki-category-menu
+{
+  li
+  {
+    padding-left:10px;
   }
 }
