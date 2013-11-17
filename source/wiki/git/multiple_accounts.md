@@ -1,5 +1,5 @@
 ---
-title: "Git Tips"
+title: "Multiple Accounts"
 ---
 
 ## Multiple github account authentication using SSH
