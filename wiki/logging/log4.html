@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <!-- Use title if it's in the page YAML frontmatter -->
-        <title>Ember Useful Tips And Gotchas</title>
+        <title>Log4</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -29,60 +29,18 @@
             </header>
             <div class="page-body">
                 <div class="primary">
-                    <p><a href="http://emberjs.com/guides/understanding-ember/the-view-layer/#toc_adding-new-events">List of DOM events</a></p>
+                    <p>Ruby: <a href="https://github.com/colbygk/log4r">Log4R</a></p>
 
-<p>See all the Templates Ember knows about in the application: </p>
+<p>Objective C / Cocoa: <a href="https://github.com/robbiehanson/CocoaLumberjack">Cocoa Lumberjack</a></p>
 
-<p><code>
-$ Ember.TEMPLATES
-</code></p>
-
-<p>Set the template used by the application:</p>
-
-<p><code>
-ExampleApp.ApplicationView = Ember.View.extend({
-  templateName: 'news_items/application'
-});
-</code></p>
-
-<p>Set the element to append the app template to:</p>
-
-<p><code>
-ExampleApp = Ember.Application.create({
-  rootElement: $('#example-container')
-});
-</code></p>
-
-<p>Tell Ember how to correctly pluralize a Model:</p>
-
-<p><em>In <code>store.js</code></em></p>
-
-<p><code>
-DS.RESTAdapter.configure('plurals', {example:'examples'});
-</code></p>
-
-<p>Bind the disabled property of a button to the number of items in an ArrayController, so that if there are no items, the button is disabled:</p>
-
-<p><code>
-&lt;button {{action clearAll}} {{bindAttr disabled="anyEntries"}}&gt;Clear All&lt;/button&gt;
-</code></p>
-
-<p><code>
-  anyEntries: function() {
-    return this.content.get('length') == 0;
-  }.property('content.length'),
-</code></p>
-
-<p><em>I'm creating new models, but the view isn't updating, even when I refresh. However the models are there.</em></p>
-
-<p>This is probably an issue with the Route. It isn't passing the Models to the COntroller correctly.</p>
+<p>Javascript: <a href="http://log4javascript.org">Log4JS</a></p>
 
                 </div>
                 <div class="secondary">
                     <ul class="wiki-menu">
   
     <li class="wiki-category">
-      <h2>Angular </h2>
+      <h2 class="section-title">Angular </h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -101,7 +59,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2></h2>
+      <h2 class="section-title"></h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -112,7 +70,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2></h2>
+      <h2 class="section-title"></h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -123,7 +81,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Browser</h2>
+      <h2 class="section-title">Browser</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -146,7 +104,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>CSS</h2>
+      <h2 class="section-title">CSS</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -157,7 +115,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Deployment</h2>
+      <h2 class="section-title">Deployment</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -168,7 +126,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2></h2>
+      <h2 class="section-title"></h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -179,50 +137,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Ember</h2>
-      <ul class="wiki-category-menu">
-        
-          <li>
-            <a href="/wiki/ember_js/ember_basics.html">Ember Basics</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_controllers.html">Ember Controllers</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_debugging.html">Ember Debugging</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_notes.html">Ember Notes</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_routing.html">Ember Routing</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_templates.html">Ember Templates</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_templates_and_controllers_communication.html">Ember Templates And Controllers Communication</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_useful_tips_and_gotchas.html">Ember Useful Tips And Gotchas</a>
-          </li>
-        
-          <li>
-            <a href="/wiki/ember_js/ember_views.html">Ember Views</a>
-          </li>
-        
-      </ul>
-    </li>
-  
-    <li class="wiki-category">
-      <h2>Git</h2>
+      <h2 class="section-title">Git</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -233,7 +148,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Google Analytics</h2>
+      <h2 class="section-title">Google Analytics</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -244,7 +159,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Handlebars JS</h2>
+      <h2 class="section-title">Handlebars JS</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -255,7 +170,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Heroku</h2>
+      <h2 class="section-title">Heroku</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -266,7 +181,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>HTML</h2>
+      <h2 class="section-title">HTML</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -285,7 +200,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2></h2>
+      <h2 class="section-title"></h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -296,7 +211,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>IRB</h2>
+      <h2 class="section-title">IRB</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -307,7 +222,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>JavaScript</h2>
+      <h2 class="section-title">JavaScript</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -318,18 +233,18 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2></h2>
+      <h2 class="section-title"></h2>
       <ul class="wiki-category-menu">
         
           <li>
-            <a href="/wiki/logging/log4_basics.html">Log4 Basics</a>
+            <a href="/wiki/logging/log4.html">Log4</a>
           </li>
         
       </ul>
     </li>
   
     <li class="wiki-category">
-      <h2>Middleman</h2>
+      <h2 class="section-title">Middleman</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -340,7 +255,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>PostgreSQL</h2>
+      <h2 class="section-title">PostgreSQL</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -351,7 +266,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>POW</h2>
+      <h2 class="section-title">POW</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -362,7 +277,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Project Management</h2>
+      <h2 class="section-title">Project Management</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -377,7 +292,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Ruby On Rails</h2>
+      <h2 class="section-title">Ruby On Rails</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -452,7 +367,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Rake</h2>
+      <h2 class="section-title">Rake</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -463,7 +378,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Ruby</h2>
+      <h2 class="section-title">Ruby</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -482,7 +397,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Ruby Gems</h2>
+      <h2 class="section-title">Ruby Gems</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -497,14 +412,14 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2></h2>
+      <h2 class="section-title"></h2>
       <ul class="wiki-category-menu">
         
       </ul>
     </li>
   
     <li class="wiki-category">
-      <h2>Sass</h2>
+      <h2 class="section-title">Sass</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -515,7 +430,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Sinatra</h2>
+      <h2 class="section-title">Sinatra</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -526,7 +441,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>SQL</h2>
+      <h2 class="section-title">SQL</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -537,7 +452,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2>Sublime Text</h2>
+      <h2 class="section-title">Sublime Text</h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -560,7 +475,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
     </li>
   
     <li class="wiki-category">
-      <h2></h2>
+      <h2 class="section-title"></h2>
       <ul class="wiki-category-menu">
         
           <li>
@@ -572,7 +487,7 @@ DS.RESTAdapter.configure('plurals', {example:'examples'});
           </li>
         
           <li>
-            <a href="/wiki/unix/unix-tools.html">Unix Tools</a>
+            <a href="/wiki/unix/tree.html">Unix Tools</a>
           </li>
         
       </ul>
