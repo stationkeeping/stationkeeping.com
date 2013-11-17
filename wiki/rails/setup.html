@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <!-- Use title if it's in the page YAML frontmatter -->
+        <title>Stationkeeping | </title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/css/app/application.css">
+        <script src="js/vendor/modernizr-2.6.1.min.js"></script>
+        <script type="text/javascript" src="//use.typekit.net/cay8udd.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an obsolete browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+        <![endif]-->
+        <div class="page-container">
+            <header class="page-header" >
+                <div class="brand">
+                    <object class="logo" type="image/svg+xml" data="/img/logo.svg"></object>
+                    <h1 class="name page-tile"><a href="/">Stationkeeping</a></h1>
+                </div>
+            </header>
+            <div class="page-body">
+                <div class="primary">
+                    <h4 id="rails-setup">Rails Setup</h4>
+
+<p>Create a Rails project using Postgresql for its database and skipping the creation of Test Unit files. Name the project using lowercase words separated with hyphens.
+<code>
+$ rails new example-name -d postgresql -T
+</code></p>
+
+<p>Change directory:
+<code>
+$ cd example-name
+</code></p>
+
+<p>Add the <a href="https://github.com/stationkeeping/rails/blob/master/Gemfile">Stationkeeping Gemfile</a> as base and <em>remove what you don't need</em>.
+<code>
+curl -O https://raw.github.com/stationkeeping/rails/master/Gemfile
+</code></p>
+
+<p>Then install the Gems using:
+<code>
+$ bundle install
+</code></p>
+
+<p>Fix the Ruby version:
+<code>
+$ rbenv local 1.9.3-p194
+</code></p>
+
+<p>Drop the folder onto Sublime Text and once it's open choose: <code>Project &gt; Save Project As …</code>, saving the project inside the new Rails project folder with the same name as the project.</p>
+
+<p>Add <a href="https://github.com/stationkeeping/rails/blob/master/.gitignore">Stationkeeping .gitignore</a>.
+<code>
+curl -O https://raw.github.com/stationkeeping/rails/master/.gitignore
+</code></p>
+
+<p>Add staging environment by copying <code>config/environments/production.rb</code>:
+<code>
+$ cp -i config/environments/production.rb config/environments/staging.rb
+</code>
+<em>Now modify <code>staging.rb</code> as required.</em></p>
+
+<p>Add a <code>README</code> file:
+<code>
+$ touch README.md
+</code></p>
+
+<p>Initialise a new repository:</p>
+
+<p><code>
+$ git init
+</code></p>
+
+<p>Add project to version control:</p>
+
+<p><code>
+$ git add -A
+$ git commit -m "Initial commit. Added gems to Gemfile and project-specific gitignore"
+</code></p>
+
+<p>Create a new Github or Bitbucket Repository. Add it to your local repository as a remote and push it.</p>
+
+<p>Setup POW symlink to make application available on <code>.dev</code> using:
+<code>
+$ powder link
+</code></p>
+
+<h4 id="heroku-setup">Heroku Setup</h4>
+
+<p>Create Heroku app for <code>staging</code>:
+<code>
+$ heroku create example-name --remote staging --region eu
+</code>
+Check remote is up and running:
+<code>
+$ heroku ps --remote staging
+$ heroku open --remote staging
+</code></p>
+
+<p>Make sure staging runs the correct environment by setting environmental variables:
+<code>
+heroku config:set RACK_ENV=staging RAILS_ENV=staging --remote staging
+</code></p>
+
+<p>Check to see if there is a remote set up for staging:
+<code>
+$ git remote -v
+</code></p>
+
+<p>If it isn't there, add it manually:
+<code>
+$ git remote add staging git@heroku.com:plp-s.git
+</code></p>
+
+<p>Push local Envs
+<code>
+$ heroku config:push --remote staging
+</code></p>
+
+<p>Set staging as the default app (to avoid adding <code>-a example-app-name</code> to every Heroku CLI command)
+<code>
+$ git config heroku.remote staging
+</code></p>
+
+<p>Add (free) database backups.
+<code>
+heroku addons:add pgbackups --remote staging -a example-app
+</code></p>
+
+<p>Enable compile time ENV access
+<code>
+heroku labs:enable user-env-compile -a example-app
+</code></p>
+
+<p>Push and migrate
+<code>
+$ git push staging master
+$ heroku run rake db:migrate --remote staging
+</code></p>
+
+<p><em>Repeat the above with <code>production</code>.</em></p>
+
+<h4 id="database-setup">Database Setup</h4>
+
+<p>Open <code>config/database.yml</code> and change usernames from application name (default) to PostgreSQL username. Also delete production.</p>
+
+<p>```
+common: &amp;common
+  adapter: postgresql
+  encoding: unicode
+  username: pedr</p>
+
+<p>development:
+  «: *common
+  database: pathways-archive_development</p>
+
+<p>test:
+  «: *common
+  database: pathways-archive_test
+```</p>
+
+<h4 id="environments">Environments</h4>
+
+<p>Staging and Production will share many of the same config settings. To DRY this up, we create a separate class for their shared settings which both include in `config/environments/shared/remotes.rb':</p>
+
+<p><code>
+Example::Application.configure do
+  # Settings specified here will take precedence over those in config/application.rb
+  # Shared settings ...
+end
+</code></p>
+
+<p>Then move all shared settings from <code>config/environments/production.rb</code> and <code>config/environments/staging.rb</code> to it, leaving both only with unique settings. Both classes need to require `config/environments/shared/remotes.rb':</p>
+
+<p>Require settings shared between Production and Staging</p>
+
+<p>```
+require Rails.root.join('config/environments/shared/remote')</p>
+
+<p>Example::Application.configure do
+  # Settings specified here will take precedence over those in config/application.rb
+  config.action_mailer.default_url_options = { :host =&gt; ENV['PRODUCTION_HOST'] }
+end
+```</p>
+
+<h4 id="dotenv">DotEnv</h4>
+
+<p>Manage local environmental variables with .env.</p>
+
+<h4 id="add-environmental-variables">Add Environmental Variables</h4>
+
+<p>Get the <a href="https://raw.github.com/stationkeeping/rails/master/.env">Stationkeeping default envs</a> 
+<code>
+$ curl -O https://raw.github.com/stationkeeping/rails/master/.env
+</code></p>
+
+<p>Push Environmental Variables to Production and Staging
+<code>
+heroku config:push --remote production
+heroku config:push --remote staging
+</code></p>
+
+<p>Remove <code>public/index.html</code></p>
+
+<h4 id="setup-an-s3-bucket-for-assets">Setup an S3 Bucket for assets</h4>
+
+<p>Log into the <a href="https://console.aws.amazon.com/console/home">Amazon S3 Console</a>:</p>
+
+<p>Create a bucket using [app-name]-[tld]-assets e.g. <em>example-app-name-com-assets</em>.</p>
+
+<p>Add a CORS Configuration if you need to support XHRs:</p>
+
+<p><code>
+&lt;CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"&gt;
+    &lt;CORSRule&gt;
+        &lt;AllowedOrigin&gt;*&lt;/AllowedOrigin&gt;
+        &lt;AllowedMethod&gt;GET&lt;/AllowedMethod&gt;
+        &lt;MaxAgeSeconds&gt;3000&lt;/MaxAgeSeconds&gt;
+        &lt;AllowedHeader&gt;*&lt;/AllowedHeader&gt;
+    &lt;/CORSRule&gt;
+&lt;/CORSConfiguration&gt;
+</code></p>
+
+<h3 id="asset-sync">Asset Sync</h3>
+
+<p>Set the asset controller host for your environment. This should match the FOG_DIRECTORY env 
+<code>
+config.action_controller.asset_host = "//pathways-learning-platform-assets.s3.amazonaws.com"
+</code></p>
+
+<p>Add any CSS/JS assets that are not referenced from the manifests to the 
+<code>
+  # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
+  # config.assets.precompile += %w( search.js )  
+  # config.assets.precompile &lt;&lt; 'manifests/*.js'
+  # config.assets.precompile &lt;&lt; 'manifests/*.css'
+</code></p>
+
+<p>Make sure a digest is created:
+<code>
+  config.assets.digest = true
+</code></p>
+
+                </div>
+                <div class="secondary">
+                    <ul class="wiki-menu">
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Amazon S3</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/amazon_s3/basics.html">Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Angular </h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/angular_js/angular_basics.html">Angular Basics</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/angular_js/angular_project_setup.html">Angular Project Setup</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/angular_js/angular_tdd.html">Angular TDD</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Boxen</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/boxen/boxen_basics.html">Boxen Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Browser</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/browser/browser_stats.html">Browser Stats</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/browser/caching.html">Caching</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/browser/debugging_using_console.html">Debugging Using Console</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/browser/nice_links.html">Nice Links</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">CSS</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/css/css_images.html">CSS Images</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Deployment</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/deployment/site_prelaunch_check.html">Site Prelaunch Check</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Devise</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/devise/devise.html">Devise</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/devise/mail.html"></a>
+          </li>
+        
+          <li>
+            <a href="/wiki/devise/setup.html">Setup</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Gems</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/gems/acts-as-taggable-on.html"></a>
+          </li>
+        
+          <li>
+            <a href="/wiki/gems/asset-sync.html">Asset Sync</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/gems/friendly_id.html">Friendly ID</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/gems/paperclip.html">Paperclip</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Git</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/git/basic_commands.html">Basic Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/branches.html">Branches</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/configuration.html">Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/multiple_accounts.html">Multiple Accounts</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/overview.html">Overview</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/git/rebasing.html">Rebasing</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Google Analytics</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/google_analytics/google_site_submission_and_analytics.html">Google Site Submission and Analytics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Handlebars JS</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/handlebars_js/handlebars_basics.html">Handlebars Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Heroku</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/heroku/deploying.html">Deploying</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/heroku/heroku_basics.html">Heroku Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">HTML</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/html/html5_api.html">HTML5 Api</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/html/ie_feature_support_list.html">IE Feature And Support List</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/html/status_codes.html">Status Codes</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Images</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/Images/general_aspect_ratios.html">General Aspect Ratios</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">IRB</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/irb/irb_configuration.html">IRB Configuration</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">JavaScript</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/js/js_objects.html">JS Objects</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Log4R</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/logging/log4.html">Log4</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Middleman</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/middleman/middleman_basics.html">Middleman Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">PostgreSQL</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/postgresql/postgresql_basics.html">PostgreSQL Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">POW</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/pow/pow_and_xip_basics.html">POW And XIP Basics </a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Project Management</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/project_management/project_managment_workflow.html">Project Management Workflow</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/project_management/thoughts_for_project_budgeting.html">Thoughts For Project Budgeting</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Ruby On Rails</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/rails/active_record.html">Rails Active Record</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/active_record_associations.html">Rails Active Record Associations</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/assets.html"></a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/background_tasks.html">Rails Background Tasks</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/bootstrap.html">Bootstrap</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/console.html">Rails Console</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/controllers.html">Rails Controllers</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/custom_error_messages.html">Rails Custom Error Messages</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/debugging_errors_and_exceptions.html">Rails Debugging Errors And Exceptions</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/form_objects.html">Rails Form Objects</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/logging.html">Rails Logging</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/migrations.html">Rails Migrations</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/naming_models.html">Rails Naming Models</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/polymorphic_associations.html">Rails Polymorphic Associations</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/prelaunch_check.html">Rails Prelaunch Check</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/project_setup.html">Rails Project Setup</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/routing.html">Rails Routing</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/settings_and_startup.html">Rails Settings And Startup</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/setup.html"></a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/testing.html">Testing</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/rails/using_pry.html">Rails Using Pry</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Rake</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/rake/basics.html">Rake Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Rbenv</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/rbenv/rbenv.html">Rbenv</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Ruby</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/ruby/date_and_time.html">Ruby Date And Time</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/ruby/metaprogramming.html">Ruby Metaprogramming</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/ruby/misc.html">Ruby Misc</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Ruby Gems</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/ruby_gems/basics.html">Ruby Gems Basics</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/ruby_gems/creating_a_gem.html">Creating A Gem</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/ruby_gems/gems-for-development.html">Gems For Development</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Sass</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/sass/sass_structure.html">Sass Structure</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Sinatra</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/sinatra/sinatra_basics.html">Sinatra Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">SQL</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/sql/sql_basics.html">SQL Basics</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">Sublime Text</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/sublime_text/sublime_keymap.html">Sublime Text Keymap</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/sublime_text/sublime_packages.html">Sublime Text Packages</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/sublime_text/sublime_setup.html">Sublime Text Setup</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/sublime_text/sublime_syntax_specific_settings.html">Sublime Text Syntax Specific Settings</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+    <li class="wiki-category">
+      <h2 class="section-title">UNIX</h2>
+      <ul class="wiki-category-menu">
+        
+          <li>
+            <a href="/wiki/unix/adding_aliases_in_bash.html">Adding Aliases In Bash</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/unix/linux_commands.html">Linux Commands</a>
+          </li>
+        
+          <li>
+            <a href="/wiki/unix/tree.html">Unix Tools</a>
+          </li>
+        
+      </ul>
+    </li>
+  
+</ul>
+
+                </div>
+            </div>
+            <footer class="page-footer">
+                <p>Sculpted from lint by the gentle fingers of Simon's mum</p>
+                <object class="logo" type="image/svg+xml" data="/img/logo.svg"></object>
+            </footer>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-45808895-1', 'stationkeeping.com');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>
