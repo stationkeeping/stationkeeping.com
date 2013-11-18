@@ -1,1 +1,1 @@
-Welcome to **Stationkeeping** - a compendium of useful information relating to software development. Core contributers are [Pedr Browne][@pedrbrowne] and [Simon Bailey][@newtriks].
+Welcome to **Stationkeeping** - a compendium of useful information relating to software development. Core contributers are [Pedr Browne](https://twitter.com/@pedrbrowne) and [Simon Bailey](https://twitter.com/@newtriks).
